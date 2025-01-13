@@ -7,24 +7,21 @@ const ChatWindow = ({ selectedTeam }) => {
     const [input, setInput] = useState("");  // Message à envoyer
 
     useEffect(() => {
-        if (!selectedTeam) return;  // Si aucune équipe sélectionnée, ne rien faire
+        if (!selectedTeam) return;
 
         // Connecter le socket
         const newSocket = io('http://localhost:3000');
         setSocket(newSocket);
 
-        // Log connection status
         newSocket.on('connect', () => {
-            console.log('Connected to server:', newSocket.id);
+            console.log('Connected to server:', newSocket.id);  // Vérifiez que cette ligne s'affiche
         });
 
-        // Listen for server responses
         newSocket.on('response', (data) => {
-            console.log('Response from server:', data);
+            console.log('Response from server:', data);  // Vérifiez ici si vous obtenez des réponses du serveur
             setMessages((prevMessages) => [...prevMessages, data]);
         });
 
-        // Cleanup on unmount
         return () => {
             newSocket.disconnect();
         };
@@ -33,7 +30,7 @@ const ChatWindow = ({ selectedTeam }) => {
     const handleSendMessage = () => {
         if (input.trim() && socket) {
             socket.emit('input', input); // Envoi du message au serveur
-            setInput(''); // Réinitialise le champ d'entrée
+            setInput('');
         }
     };
 
