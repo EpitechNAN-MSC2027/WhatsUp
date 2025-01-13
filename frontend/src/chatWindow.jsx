@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
+import commands from './commands'; // Import du dictionnaire des commandes
 
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]); // Messages reçus du serveur
-    const [input, setInput] = useState("");  // Message à envoyer
+    const [input, setInput] = useState(""); // Message à envoyer
+    const [commandSuggestions, setCommandSuggestions] = useState([]); // Suggestions de commandes
 
     useEffect(() => {
         if (!selectedTeam) return;
@@ -29,7 +31,29 @@ const ChatWindow = ({ selectedTeam }) => {
         if (input.trim() && socket) {
             socket.emit('input', input); // Envoi du message au serveur
             setInput('');
+            setCommandSuggestions([]); // Réinitialiser les suggestions après l'envoi
         }
+    };
+
+    const handleInputChange = (e) => {
+        const userInput = e.target.value;
+        setInput(userInput);
+
+        // Affichage des suggestions si l'input commence par "/"
+        if (userInput.startsWith('/')) {
+            const commandPrefix = userInput.slice(1).toLowerCase();
+            const suggestions = Object.keys(commands)
+                .filter(command => command.startsWith(commandPrefix))
+                .map(command => command);
+            setCommandSuggestions(suggestions);
+        } else {
+            setCommandSuggestions([]); // Si ce n'est pas une commande, on supprime les suggestions
+        }
+    };
+
+    const handleSuggestionClick = (command) => {
+        setInput(`/${command}`); // Remplit l'input avec la commande sélectionnée
+        setCommandSuggestions([]); // Cache les suggestions après le clic
     };
 
     return (
@@ -40,7 +64,7 @@ const ChatWindow = ({ selectedTeam }) => {
                     <div className="messages">
                         {messages.map((msg, index) => (
                             <div key={index} className="message">
-                                {/* Si la réponse est une liste de canaux */}
+                                {/* Affichez les messages ou réponses */}
                                 {msg.type === "list" ? (
                                     <div>
                                         <strong>Channels:</strong>
@@ -51,7 +75,6 @@ const ChatWindow = ({ selectedTeam }) => {
                                         </ul>
                                     </div>
                                 ) : (
-                                    // Si c'est un message normal, on affiche simplement le texte
                                     msg.text ? msg.text : msg.message || "Message inconnu"
                                 )}
                             </div>
@@ -62,9 +85,24 @@ const ChatWindow = ({ selectedTeam }) => {
                             type="text"
                             placeholder="Type a message, e.g., /list or Hello!"
                             value={input}
-                            onChange={(e) => setInput(e.target.value)}
+                            onChange={handleInputChange}
                         />
                         <button onClick={handleSendMessage}>Send</button>
+                        {commandSuggestions.length > 0 && (
+                            <div className="command-suggestions">
+                                <ul>
+                                    {commandSuggestions.map((command, index) => (
+                                        <li
+                                            key={index}
+                                            onClick={() => handleSuggestionClick(command)}
+                                            style={{ cursor: 'pointer' }} // Curseur en forme de main
+                                        >
+                                            {command} - {commands[command]}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </>
             ) : (

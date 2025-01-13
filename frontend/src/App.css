@@ -86,6 +86,27 @@
     background-color: #e6a5ab;
 }
 
-p {
-    color:#9c6956;
+.command-suggestions {
+    position: absolute;
+    background-color: #f4c4ba;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 75%;
+    z-index: 1;
+    bottom: 70px;
+}
+
+.command-suggestions ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.command-suggestions li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.command-suggestions li:hover {
+    background-color: #c26c70;
 }
