@@ -1,30 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
-const ChatWindow = ({ selectedTeam, socket }) => {
-    const [messages, setMessages] = useState([]); // Messages reçus
-    const [input, setInput] = useState(""); // Message à envoyer
+const ChatWindow = ({ selectedTeam }) => {
+    const [socket, setSocket] = useState(null);
+    const [messages, setMessages] = useState([]); // Messages reçus du serveur
+    const [input, setInput] = useState("");  // Message à envoyer
 
-    // Écoute des réponses du serveur
     useEffect(() => {
-        if (socket) {
-            socket.on("response", (data) => {
-                setMessages((prevMessages) => [...prevMessages, data]);
-            });
-        }
+        if (!selectedTeam) return;  // Si aucune équipe sélectionnée, ne rien faire
 
-        // Cleanup à la suppression du composant
+        // Connecter le socket
+        const newSocket = io('http://localhost:3000');
+        setSocket(newSocket);
+
+        // Log connection status
+        newSocket.on('connect', () => {
+            console.log('Connected to server:', newSocket.id);
+        });
+
+        // Listen for server responses
+        newSocket.on('response', (data) => {
+            console.log('Response from server:', data);
+            setMessages((prevMessages) => [...prevMessages, data]);
+        });
+
+        // Cleanup on unmount
         return () => {
-            if (socket) {
-                socket.off("response"); // Désabonnez-vous de l'événement
-            }
+            newSocket.disconnect();
         };
-    }, [socket]);
+    }, [selectedTeam]);
 
-    // Gestion de l'envoi de message
     const handleSendMessage = () => {
         if (input.trim() && socket) {
-            socket.emit("input", input); // Envoi du message au serveur
-            setInput(""); // Réinitialise le champ d'entrée
+            socket.emit('input', input); // Envoi du message au serveur
+            setInput(''); // Réinitialise le champ d'entrée
         }
     };
 
