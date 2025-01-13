@@ -8,17 +8,15 @@ const ChatWindow = ({ selectedTeam }) => {
 
     useEffect(() => {
         if (!selectedTeam) return;
-
-        // Connecter le socket
         const newSocket = io('http://localhost:3000');
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
-            console.log('Connected to server:', newSocket.id);  // Vérifiez que cette ligne s'affiche
+            console.log('Connected to server:', newSocket.id);
         });
 
         newSocket.on('response', (data) => {
-            console.log('Response from server:', data);  // Vérifiez ici si vous obtenez des réponses du serveur
+            console.log('Response from server:', data);
             setMessages((prevMessages) => [...prevMessages, data]);
         });
 
@@ -42,7 +40,20 @@ const ChatWindow = ({ selectedTeam }) => {
                     <div className="messages">
                         {messages.map((msg, index) => (
                             <div key={index} className="message">
-                                {typeof msg === "object" ? JSON.stringify(msg, null, 2) : msg}
+                                {/* Si la réponse est une liste de canaux */}
+                                {msg.type === "list" ? (
+                                    <div>
+                                        <strong>Channels:</strong>
+                                        <ul>
+                                            {msg.channels.map((channel, idx) => (
+                                                <li key={idx}>{channel}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ) : (
+                                    // Si c'est un message normal, on affiche simplement le texte
+                                    msg.text ? msg.text : msg.message || "Message inconnu"
+                                )}
                             </div>
                         ))}
                     </div>
