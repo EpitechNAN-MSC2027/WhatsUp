@@ -12,51 +12,80 @@ export function createWebsocketServer(server) {
     // Handle connections
     io.on('connection', (socket) => {
         console.log('A user connected:', socket.id);
+        
+        socket.on('input', (input) => {
+            console.log(`Input: ${input}`);
+            
+            if (input.startsWith('/')) {
+                // Parse the command
+                const [fullCommand, ...args] = input.slice(1).split(' '); // Remove '/' and split by space
+                const command = fullCommand.toLowerCase(); // Normalize command to lowercase
+                const argument = args.join(' '); // Rejoin the remaining parts as the argument
 
-        // Handle 'create' event
-        socket.on('create', (channelName) => {
-            console.log(`Creating channel: ${channelName}`);
+                console.log(`Command: ${command}, Argument: ${argument}`);
 
-            // Simulate database logic
-            const channels = ["general", "random"]; // Example: Pretend this is your database
-            if (!channels.includes(channelName)) {
-                channels.push(channelName); // Add channel to the database
-                socket.emit('response', { type: 'create', message: `Channel "${channelName}" created` });
+                // Use a switch statement to handle commands
+                switch (command) {
+                    case 'create':
+                        if (argument) {
+                            console.log(`Creating channel: ${argument}`);
+
+                            // Simulate database logic
+                            const channels = ["general", "random"]; // Example: Pretend this is your database
+                            if (!channels.includes(argument)) {
+                                channels.push(argument); // Add channel to the database
+                                socket.emit('response', { type: 'create', message: `Channel "${argument}" created` });
+                            } else {
+                                socket.emit('response', { type: 'error', message: `Channel "${argument}" already exists` });
+                            }
+                        } else {
+                            console.error('No channel name specified for /create');
+                        }
+                        break;
+
+                    case 'join':
+                        if (argument) {
+                            console.log(`Joining channel: ${argument}`);
+                            socket.emit('response', { type: 'join', message: `Joined channel "${argument}"` });
+                        } else {
+                            console.error('No channel name specified for /join');
+                        }
+                        break;
+
+                    case 'quit':
+                        if (argument) {
+                            console.log(`Quitting channel: ${argument}`);
+                            socket.emit('response', { type: 'quit', message: `Left channel "${argument}"` });
+                        } else {
+                            console.error('No channel name specified for /quit');
+                        }
+                        break;
+
+                    case 'delete':
+                        if (argument) {
+                            console.log(`Deleting channel: ${argument}`);
+                            socket.emit('response', { type: 'delete', message: `Channel "${argument}" deleted` });
+                        } else {
+                            console.error('No channel name specified for /delete');
+                        }
+                        break;
+
+                    case 'list':
+                        console.log('Listing channels');
+                        const channels = ["general", "random"]; // Example: Pretend this is your database
+                        socket.emit('response', { type: 'list', channels });
+                        break;
+
+                    default:
+                        console.error(`Unknown command: ${command}`);
+                        socket.emit('response', { type: 'error', message: `Unknown command: ${command}` });
+                        break;
+                }
             } else {
-                socket.emit('response', { type: 'error', message: `Channel "${channelName}" already exists` });
+                console.log('Received message:', input);
+                socket.emit('response', { type: 'message', text: input });
             }
-        });
-
-        // Handle 'join' event
-        socket.on('join', (channelName) => {
-            console.log(`Joining channel: ${channelName}`);
-            socket.emit('response', { type: 'join', message: `Joined channel "${channelName}"` });
-        });
-
-        // Handle 'quit' event
-        socket.on('quit', (channelName) => {
-            console.log(`Quitting channel: ${channelName}`);
-            socket.emit('response', { type: 'quit', message: `Left channel "${channelName}"` });
-        });
-
-        // Handle 'delete' event
-        socket.on('delete', (channelName) => {
-            console.log(`Deleting channel: ${channelName}`);
-            socket.emit('response', { type: 'delete', message: `Channel "${channelName}" deleted` });
-        });
-
-        // Handle 'list' event
-        socket.on('list', () => {
-            console.log('Listing channels');
-            const channels = ["general", "random"]; // Example: Pretend this is your database
-            socket.emit('response', { type: 'list', channels });
-        });
-
-        // Handle regular messages
-        socket.on('message', (text) => {
-            console.log('Received message:', text);
-            socket.emit('response', { type: 'message', text: text });
-        });
+        })
 
         // Handle disconnections
         socket.on('disconnect', () => {
