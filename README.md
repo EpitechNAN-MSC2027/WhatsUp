@@ -2,4 +2,6 @@
 
 IRC app allo
 
-"npm install" pour installer express.js ou socket.io
+pour installer les dependencies: (express.js ou socket.io)
+"cd backend"
+"npm install" 
