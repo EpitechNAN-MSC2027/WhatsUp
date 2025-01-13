@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
-const connectionString = process.env.ATLAS_URI || "";
+import Message from "./models/message";
+const connectionString = "mongodb://root:example@localhost:27017";
 const client = new MongoClient(connectionString);
 let conn;
 try {
@@ -7,8 +8,6 @@ try {
 } catch(e) {
     console.error(e);
 }
-let db = conn.db("sample_training");
-
-await db.createCollection("messages");
+let db = conn.db("IRCEpitech");
 
 export default db;
