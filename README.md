@@ -1,3 +1,3 @@
 # WhatsUp
 
-IRC app a
+IRC app allo
