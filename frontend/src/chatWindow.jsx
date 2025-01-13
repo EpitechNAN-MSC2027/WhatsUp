@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import commands from './commands'; // Import du dictionnaire des commandes
+import commands from './commands';
 
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
@@ -29,9 +29,9 @@ const ChatWindow = ({ selectedTeam }) => {
 
     const handleSendMessage = () => {
         if (input.trim() && socket) {
-            socket.emit('input', input); // Envoi du message au serveur
+            socket.emit('input', input);
             setInput('');
-            setCommandSuggestions([]); // Réinitialiser les suggestions après l'envoi
+            setCommandSuggestions([]);
         }
     };
 
@@ -39,7 +39,6 @@ const ChatWindow = ({ selectedTeam }) => {
         const userInput = e.target.value;
         setInput(userInput);
 
-        // Affichage des suggestions si l'input commence par "/"
         if (userInput.startsWith('/')) {
             const commandPrefix = userInput.slice(1).toLowerCase();
             const suggestions = Object.keys(commands)
@@ -47,20 +46,20 @@ const ChatWindow = ({ selectedTeam }) => {
                 .map(command => command);
             setCommandSuggestions(suggestions);
         } else {
-            setCommandSuggestions([]); // Si ce n'est pas une commande, on supprime les suggestions
+            setCommandSuggestions([]);
         }
     };
 
     const handleSuggestionClick = (command) => {
         setInput(`/${command}`); // Remplit l'input avec la commande sélectionnée
-        setCommandSuggestions([]); // Cache les suggestions après le clic
+        setCommandSuggestions([]);
     };
 
     return (
         <div className="chat-window">
             {selectedTeam ? (
                 <>
-                    <h3>{selectedTeam.name} - Chat</h3>
+                    <h2>{selectedTeam.name} - Chat</h2>
                     <div className="messages">
                         {messages.map((msg, index) => (
                             <div key={index} className="message">
@@ -95,7 +94,7 @@ const ChatWindow = ({ selectedTeam }) => {
                                         <li
                                             key={index}
                                             onClick={() => handleSuggestionClick(command)}
-                                            style={{ cursor: 'pointer' }} // Curseur en forme de main
+                                            style={{ cursor: 'pointer' }}
                                         >
                                             {command} - {commands[command]}
                                         </li>

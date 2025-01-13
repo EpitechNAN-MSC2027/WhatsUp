@@ -1,5 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
+h3 {
+    margin:0 0 10px 0;
+    font-family: "Playwrite AU SA", serif;
+    font-size: 1.6rem;
+    color:#5ab6db;
+}
 
+h2 {
+    font-family: "Playwrite AU SA", serif;
+    margin:0 0 15px 10px;
+    font-size: 1.9rem;
+    color:#f4c4ba;
+}
 
 .app-container {
     display: flex;
