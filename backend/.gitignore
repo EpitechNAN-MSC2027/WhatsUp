@@ -2,3 +2,4 @@ node_modules
 bun.lockb
 testindex.http
 .idea
+package-lock.json
