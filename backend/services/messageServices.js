@@ -1,19 +1,37 @@
+import db from "../app.js";
+import Message from "../models/message.js";
+
 /**
  * Gets all messages from a channel
  * @param channel
- * @returns {Promise<WithId<Document>[]>}
+ * @returns {WithId<Document>[]}
  */
-export function getAllMessagesFromChannel(channel) {
-    return db.collection("messages").find({channel: channel}).toArray();
+export async function getAllMessagesFromChannel(channel) {
+    return await db.collection("messages").find({channel: channel}).toArray();
 }
 
 /**
  * Writes a message to the database
- * @param message
- * @returns {Promise<InsertOneResult<Document>>}
+ * @param user
+ * @param channel
+ * @param content
+ * @returns {InsertOneResult<Document>}
  */
-export function writeMessage(message) {
-    return db.collection("messages").insertOne(message.toConst());
+export async function writeMessage(user, channel, content) {
+
+    let date = new Date();
+
+    let message = new Message(
+        user,
+        channel,
+        content,
+        date
+    );
+
+    let response =  await db.collection("messages").insertOne(message.toConst());
+    if (!response.acknowledged){
+        throw new Error("Message not written");
+    }
 }
 
 /**
@@ -21,18 +39,25 @@ export function writeMessage(message) {
  * @param channel
  * @param page
  * @param pageSize
- * @returns {Promise<WithId<Document>[]>}
+ * @returns {WithId<Document>[]}
  */
-export function getMessagesFromChannelPaginated(channel, page, pageSize) {
-    return db.collection("messages").find({channel: channel}).sort("date", -1).skip(page * pageSize).limit(pageSize).toArray();
+export async function getMessagesFromChannelPaginated(channel, page, pageSize) {
+
+    let result = await db.collection("messages").find({channel: channel}).sort("date", -1).skip(page * pageSize).limit(pageSize).toArray();
+    if(result.length === 0) {
+        throw new Error("No messages found");
+    }
+    return result;
 }
 
 
 /**
  * Deletes a message from the database
  * @param message the message to delete
- * @returns {Promise<DeleteResult>} the result of the delete operation
  */
-export function deleteMessage(message) {
-    return db.collection("messages").deleteOne(message);
+export async function deleteMessage(message) {
+    let result = await db.collection("messages").deleteOne(message);
+    if (!result.acknowledged){
+        throw new Error("Message not deleted");
+    }
 }

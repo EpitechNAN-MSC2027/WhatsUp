@@ -1,18 +1,18 @@
 import db from "../app";
 
 
-export function createUser(user) {
-    return db.collection("users").insertOne(user.toConst());
+export async function createUser(user) {
+    return await db.collection("users").insertOne(user.toConst());
 }
 
-export function getUser(username) {
-    return db.collection("users").findOne({username: username});
+export async function getUser(username) {
+    return await db.collection("users").findOne({username: username});
 }
 
-export function deleteUser(username) {
-    return db.collection("users").deleteOne({username: username});
+export async function deleteUser(username) {
+    return await db.collection("users").deleteOne({username: username});
 }
 
-export function updateUser(user) {
-    return db.collection("users").updateOne({username: user.username}, {$set: user.toConst()});
+export async function updateUser(user) {
+    return await db.collection("users").updateOne({username: user.username}, {$set: user.toConst()});
 }
