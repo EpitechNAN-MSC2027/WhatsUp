@@ -51,7 +51,7 @@ const ChatWindow = ({ selectedTeam }) => {
     };
 
     const handleSuggestionClick = (command) => {
-        setInput(`/${command}`); // Remplit l'input avec la commande sélectionnée
+        setInput(`/${command}`);
         setCommandSuggestions([]);
     };
 

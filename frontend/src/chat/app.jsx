@@ -14,21 +14,21 @@ const App = () => {
     ];
 
     const profile = {
-        name: "John Doe",
-        avatar: "https://via.placeholder.com/80", // URL de l'avatar
+        name: "Bellinna",
+        avatar: "https://via.placeholder.com/80",
     };
 
     const members = [
-        { name: "Alice", avatar: "https://via.placeholder.com/40" },
-        { name: "Bob", avatar: "https://via.placeholder.com/40" },
-        { name: "Charlie", avatar: "https://via.placeholder.com/40" },
+        { name: "Alice"},
+        { name: "Bob"},
+        { name: "Charlie"},
     ];
 
     return (
         <div className="app-container">
             <Sidebar teams={teams} onTeamSelect={setSelectedTeam} />
             <ChatWindow selectedTeam={selectedTeam} />
-            <RightSidebar profile={profile} members={members} /> {/* Ajoutez RightSidebar */}
+            <RightSidebar profile={profile} members={members} />
         </div>
     );
 };

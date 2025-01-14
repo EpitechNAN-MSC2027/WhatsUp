@@ -2,13 +2,11 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 250px;
     height: 100%;
-    background-color: #f8f9fa; /* Couleur de fond */
+    background-color: #f4c7ba;
     border-left: 1px solid #ddd;
     display: flex;
     flex-direction: column;
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
 }
 
@@ -16,7 +14,8 @@
 .profile-section {
     padding: 20px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid #c26c70;
+    height: 17%;
 }
 
 .avatar {
