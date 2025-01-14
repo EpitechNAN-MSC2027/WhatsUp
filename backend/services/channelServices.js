@@ -63,7 +63,6 @@ export async function createChannel(channelName, username) {
     let channel = {
         channelName : channelName,
         username : username,
-        messages: [],
         users : [username]
     }
 
