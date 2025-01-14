@@ -1,6 +1,6 @@
 import {Server} from "socket.io";
 
-import * as commands from "./handle_commands.js";
+import * as commands from "./handleCommands.js";
 
 async function wrongArgsResponse(socket, action) {
     socket.emit('response', {
@@ -12,6 +12,10 @@ async function wrongArgsResponse(socket, action) {
     })
 }
 
+/**
+ * Create the Websocket Server and handle client connections
+ * @param server
+ */
 export function createWebsocketServer(server) {
     const io = new Server(server, {
         cors: {
@@ -116,7 +120,7 @@ export function createWebsocketServer(server) {
 
                         user = args[0];
                         message = args[1];
-                        await commands.messageUser(socket, user, message);
+                        await commands.messageUser(io, socket, user, message);
                         break;
 
                     default:
