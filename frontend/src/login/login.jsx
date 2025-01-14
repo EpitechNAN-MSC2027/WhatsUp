@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './style.css';
+import './login.css';
 
 const SignInForm = ({ switchToSignUp, navigateToChat }) => {
     const handleSubmit = async (e) => {

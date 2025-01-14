@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Sidebar from './Sidebar';
-import ChatWindow from './ChatWindow';
+import Sidebar from '../sidebar.jsx';
+import ChatWindow from './chatWindow.jsx';
 import './App.css';
 
 

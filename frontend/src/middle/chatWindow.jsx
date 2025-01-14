@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import commands from './commands';
+import commands from './commands.jsx';
 
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
