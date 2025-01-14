@@ -2,12 +2,13 @@ import db from "../app";
 
 
 /**
- * Gets all channels
+ * Gets all channels with an optional filter on the name that does the LIKE operation
  * @returns {WithId<Document>[]}
  * @throws Error if no channels were found
  */
-export async function getAllChannels() {
-    let res = await db.collection("channels").find().toArray();
+export async function getChannels(filter) {
+    let regexPattern = `.* {${filter}}.*`
+    let res = await db.collection("channels").find({name: new RegExp(regexPattern)} ).toArray();
     if( res.length === 0 ) {
         throw new Error("No channels found");
     }
