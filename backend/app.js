@@ -1,6 +1,6 @@
 import express from 'express';
 import { createServer } from 'node:http';
-import { createWebsocketServer } from './websocket.js';
+import { createWebsocketServer } from './controller/websocket.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { connectDB } from "./db/connection.js";

@@ -1,6 +1,9 @@
 import * as process from "./data_processing.js";
+import * as channel_services from "../services/channelServices.js";
 
-
+/**
+ * Gets all channels
+ */
 async function successResponse(socket, action, message, data) {
     socket.emit('response', {
         status: 'success',
@@ -77,7 +80,14 @@ export async function createChannel(socket, channel) {
     console.log(`Creating channel: ${channel}`);
 
     try {
+        const channel_created = channel_services.createChannel(channel, socket.nickname);
 
+        await successResponse(
+            socket,
+            'create',
+            'Successfully created channel',
+            channel_created,
+        )
     } catch (error) {
         await errorResponse(
             socket,
