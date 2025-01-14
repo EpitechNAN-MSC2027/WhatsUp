@@ -20,6 +20,16 @@ h2 {
     font-size: 1.2rem;
 }
 
+.right-sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
 .sidebar {
     width: 15%;
     background-color: #dff2f9;
