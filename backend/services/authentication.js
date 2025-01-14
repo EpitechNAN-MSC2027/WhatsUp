@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import {getUser} from "./db/services";
-import db from "./db/connection";
+import {getUser} from "../db/services";
+import db from "../db/connection";
 import crypto from "crypto";
 
 

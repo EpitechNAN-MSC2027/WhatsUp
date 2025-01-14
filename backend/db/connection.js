@@ -12,3 +12,5 @@ export async function connectDB() {
     }
     return conn.db("IRCEpitech");
 }
+
+export default connectDB;
