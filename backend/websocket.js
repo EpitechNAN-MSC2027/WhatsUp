@@ -1,5 +1,16 @@
 import {Server} from "socket.io";
 
+import * as commands from "./handle_commands.js";
+
+async function wrongArgsResponse(socket, action) {
+    socket.emit('response', {
+        status: 'error',
+        action,
+        message: 'Wrong number of arguments',
+        data: null,
+        timestamp: new Date().toISOString(),
+    })
+}
 
 export function createWebsocketServer(server) {
     const io = new Server(server, {
@@ -11,85 +22,124 @@ export function createWebsocketServer(server) {
 
     // Handle connections
     io.on('connection', (socket) => {
-        console.log('A user connected:', socket.id);
+        console.log(`Socket connected: ${socket.id}`);
         
-        socket.on('input', (input) => {
+        socket.on('input', async (input) => {
             console.log(`Input: ${input}`);
-            
-            if (input.startsWith('/')) {
+
+            if (input.data.startsWith('/')) {
                 // Parse the command
-                const [fullCommand, ...args] = input.slice(1).split(' '); // Remove '/' and split by space
+                const [fullCommand, ...args] = input.data.slice(1).split(' '); // Remove '/' and split by space
+                console.log(fullCommand, args);
+                console.log("Type of args:", typeof args);
                 const command = fullCommand.toLowerCase(); // Normalize command to lowercase
-                const argument = args.join(' '); // Rejoin the remaining parts as the argument
 
-                console.log(`Command: ${command}, Argument: ${argument}`);
+                console.log(`Command: ${command}, Argument: ${args}`);
 
-                // Use a switch statement to handle commands
+                let channel, nickname, filter, user, message;
+                // Switch statement to handle commands
                 switch (command) {
-                    case 'create':
-                        if (argument) {
-                            console.log(`Creating channel: ${argument}`);
-
-                            // Simulate database logic
-                            const channels = ["general", "random"]; // Example: Pretend this is your database
-                            if (!channels.includes(argument)) {
-                                channels.push(argument); // Add channel to the database
-                                socket.emit('response', { type: 'create', message: `Channel "${argument}" created` });
-                            } else {
-                                socket.emit('response', { type: 'error', message: `Channel "${argument}" already exists` });
-                            }
-                        } else {
-                            console.error('No channel name specified for /create');
+                    case 'nick':
+                        if (args.length !== 1) {
+                            await wrongArgsResponse(socket, 'nick');
+                            break;
                         }
-                        break;
 
-                    case 'join':
-                        if (argument) {
-                            console.log(`Joining channel: ${argument}`);
-                            socket.emit('response', { type: 'join', message: `Joined channel "${argument}"` });
-                        } else {
-                            console.error('No channel name specified for /join');
-                        }
-                        break;
-
-                    case 'quit':
-                        if (argument) {
-                            console.log(`Quitting channel: ${argument}`);
-                            socket.emit('response', { type: 'quit', message: `Left channel "${argument}"` });
-                        } else {
-                            console.error('No channel name specified for /quit');
-                        }
-                        break;
-
-                    case 'delete':
-                        if (argument) {
-                            console.log(`Deleting channel: ${argument}`);
-                            socket.emit('response', { type: 'delete', message: `Channel "${argument}" deleted` });
-                        } else {
-                            console.error('No channel name specified for /delete');
-                        }
+                        nickname = args[0];
+                        await commands.defineNickname(socket, nickname);
                         break;
 
                     case 'list':
-                        console.log('Listing channels');
-                        const channels = ["general", "random"]; // Example: Pretend this is your database
-                        socket.emit('response', { type: 'list', channels });
+                        if (args.length > 1) {
+                            await wrongArgsResponse(socket, 'list');
+                            break;
+                        }
+
+                        filter = args[0];
+                        await commands.listChannels(socket, filter);
+                        break;
+
+                    case 'create':
+                        if (args.length !== 1) {
+                            await wrongArgsResponse(socket, 'create');
+                            break;
+                        }
+
+                        channel = args[0];
+                        await commands.createChannel(socket, channel);
+                        break;
+
+                    case 'delete':
+                        if (args.length !== 1) {
+                            await wrongArgsResponse(socket, 'delete');
+                            break;
+                        }
+
+                        channel = args[0];
+                        await commands.deleteChannel(socket, channel);
+                        break;
+
+                    case 'join':
+                        if (args.length !== 1) {
+                            await wrongArgsResponse(socket, 'join');
+                            break;
+                        }
+
+                        channel = args[0];
+                        await commands.joinChannel(socket, channel);
+                        break;
+
+                    case 'quit':
+                        if (args.length !== 1) {
+                            await wrongArgsResponse(socket, 'quit');
+                            break;
+                        }
+
+                        channel = args[0];
+                        await commands.quitChannel(socket, channel);
+                        break;
+
+                    case 'users':
+                        if (args.length !== 0) {
+                            await wrongArgsResponse(socket, 'users');
+                            break;
+                        }
+
+                        await commands.listUsers(socket);
+                        break;
+
+                    case 'msg':
+                        if (args.length !== 2) {
+                            await wrongArgsResponse(socket, 'msg');
+                            break;
+                        }
+
+                        user = args[0];
+                        message = args[1];
+                        await commands.messageUser(socket, user, message);
                         break;
 
                     default:
                         console.error(`Unknown command: ${command}`);
-                        socket.emit('response', { type: 'error', message: `Unknown command: ${command}` });
+
+                        socket.emit('response', {
+                            status: 'error',
+                            action: 'command',
+                            message: `Unknown command: ${command}`,
+                            data: null,
+                            timestamp: new Date().toISOString(),
+                        })
                         break;
                 }
             } else {
-                console.log('Received message:', input);
-                socket.emit('response', { type: 'message', text: input });
+                console.log('Received message:', input.data);
+                await commands.sendMessage(io, socket, input.data);
             }
         })
 
         // Handle disconnections
         socket.on('disconnect', () => {
-            console.log('A user disconnected:', socket.id);
+            console.log(`Socket disconnected: ${socket.id}`);
         });
     });
 }

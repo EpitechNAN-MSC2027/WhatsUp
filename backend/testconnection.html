@@ -23,29 +23,87 @@
 <script>
     // Connect to the server
     const socket = io('http://localhost:3000');
+    const inputField = document.getElementById('inputField');
+    const outputArea = document.getElementById('outputArea');
 
     // Log connection status
     socket.on('connect', () => {
         console.log('Connected to server:', socket.id);
     });
 
-    // Listen for server responses
-    socket.on('response', (data) => {
-        console.log('Response from server:', data);
-
-        // Display the server's response in the output area
-        const outputArea = document.getElementById('outputArea');
-        outputArea.textContent += `\n${JSON.stringify(data, null, 2)}`;
-    });
-
     // Handle command input
     document.getElementById('sendButton').addEventListener('click', () => {
-        const inputField = document.getElementById('inputField');
         const input = inputField.value.trim();
 
-        socket.emit('input', input);
+        socket.emit('input', {
+            data: input,
+            // token: token,
+            timestamp: new Date().toISOString(),
+        });
 
         inputField.value = ''; // Clear the input field
+    });
+
+    // Listen for server responses
+    socket.on('response', (response) => {
+        if (response.status === 'error') {
+            outputArea.textContent += `Error on ${response.action}: ${response.message}\n`;
+        }
+
+        if (response.status === 'success') {
+            switch (response.action) {
+                case 'message':
+                    console.log(response.message);
+                    break;
+
+                case 'nick':
+                    outputArea.textContent += `${response.message}: ${response.data}\n`;
+                    break;
+
+                case 'list':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'create':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'delete':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'join':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'quit':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'users':
+                    outputArea.textContent += `${response.message}\n${response.data}\n`;
+                    break;
+
+                case 'msg':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'error':
+                    outputArea.textContent += `${response.data}\n`;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        console.log('Response from server:', response);
+        // outputArea.textContent += `\n${JSON.stringify(data, null, 2)}`;
+    });
+
+    socket.on('message', (message) => {
+        console.log('message received: ', message);
+        outputArea.textContent += `${message}\n`;
     });
 </script>
 </html>
