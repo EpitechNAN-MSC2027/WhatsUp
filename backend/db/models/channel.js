@@ -4,7 +4,6 @@ export class Channel {
     constructor(name, administrator, messages, users) {
         this.name = name;
         this.administrator = administrator;
-        this.messages = messages;
         this.users = users;
     }
 
@@ -16,7 +15,6 @@ export class Channel {
         return {
             name: this.name,
             administrator: this.administrator,
-            messages: this.messages,
             users: this.users
         };
     }
