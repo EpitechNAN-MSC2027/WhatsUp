@@ -1,4 +1,4 @@
-import db from "../connection";
+import db from "../db/connection";
 
 export class Channel {
     constructor(name, administrator, messages, users) {
