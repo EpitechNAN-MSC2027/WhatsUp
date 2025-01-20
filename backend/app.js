@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { connectDB } from "./db/connection.js";
 
+
 const app = express();
 const server = createServer(app);
 const db = await connectDB();
@@ -19,5 +20,6 @@ app.get('/', (req, res) => {
 server.listen(3000, () => {
     console.log('server running at http://localhost:3000');
 });
+
 
 export default db;
