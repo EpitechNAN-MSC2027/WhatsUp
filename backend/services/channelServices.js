@@ -72,3 +72,50 @@ export async function createChannel(channelName, username) {
         throw new Error("Channel not created")
     }
 }
+
+/**
+ * Adds a user to a channel
+ * @param channelName
+ * @param username
+ * @returns {Promise<void>}
+ */
+export async function addUserToChannel(channelName, username) {
+    let res = await db.collection("channels").findOne({name: channelName});
+    if( res.length === 0 ) {
+        throw new Error("Channel not found");
+    }
+    let updateResponse = await db.collection("channels").updateOne({name: channelName}, {$push: {users: username}});
+    if (!updateResponse.acknowledged) {
+        throw new Error("User not added to channel")
+    }
+}
+
+/**
+ * Removes a user from a channel
+ * @param channelName
+ * @param username
+ * @returns {Promise<void>}
+ */
+export async function removeUserFromChannel(channelName, username) {
+    let res = await db.collection("channels").findOne({name: channelName});
+    if( res.length === 0 ) {
+        throw new Error("Channel not found");
+    }
+    let updateResponse = await db.collection("channels").updateOne({name: channelName}, {$pull: {users: username}});
+    if (!updateResponse.acknowledged) {
+        throw new Error("User not removed from channel")
+    }
+}
+
+/**
+ * Gets all users from a channel
+ * @param channelName
+ * @returns {Promise<[*]|*>}
+ */
+export async function getChannelUsers(channelName) {
+    let res = await db.collection("channels").findOne({name: channelName});
+    if( res.length === 0 ) {
+        throw new Error("Channel not found");
+    }
+    return res.users;
+}
