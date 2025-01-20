@@ -8,7 +8,7 @@ export class Channel {
     }
 
     static fromRow(row) {
-        return new Channel(row.name, row.administrator, row.messages, row.users);
+        return new Channel(row.name, row.administrator, row.users);
     }
 
     toConst() {

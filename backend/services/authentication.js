@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
-import {getUser} from "../db/services";
-import db from "../db/connection";
+import {getUser} from "./userServices.js";
+import db from "../app.js";
 import crypto from "crypto";
+import {User} from "../models/user.js";
 
 
 const secretKey = process.env.JWT_SECRET || "secret";
@@ -11,9 +12,10 @@ const secretKey = process.env.JWT_SECRET || "secret";
  * @param password the password to hash
  * @returns {string} the hashed password
  */
-function hashPassword(password){
+export function hashPassword(password){
     return crypto.createHash('sha256').update(password).digest('hex');
 }
+
 
 /**
  * Creates a jwt token containing the channels the user administrates
@@ -54,13 +56,13 @@ export async function checkUserCredentials(username, password) {
  * @returns {Promise<boolean>} returns the promise of a boolean
  */
 export async function registerUser(username, password, nickname) {
-    let user = {username: username, password: hashPassword(password), nickname: nickname};
+    const user = new User(username, hashPassword(password), nickname, []);
     let result = await db.collection("users").findOne({username: username});
     if (result !== null){
         console.log("User already exists");
         return false;
     }
-    let insertResponse = await db.collection("users").insertOne(user);
+    let insertResponse = await db.collection("users").insertOne(user.toConst());
     return insertResponse.acknowledged;
 }
 
