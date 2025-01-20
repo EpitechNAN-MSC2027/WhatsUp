@@ -10,7 +10,6 @@ const ChatWindow = ({ selectedTeam }) => {
     const [commandSuggestions, setCommandSuggestions] = useState([]); // Suggestions de commandes
 
     useEffect(() => {
-        if (!selectedTeam) return;
         const newSocket = io('http://localhost:3000');
         setSocket(newSocket);
 
@@ -18,15 +17,15 @@ const ChatWindow = ({ selectedTeam }) => {
             console.log('Connected to server:', newSocket.id);
         });
 
-        newSocket.on('response', (data) => {
-            console.log('Response from server:', data);
-            setMessages((prevMessages) => [...prevMessages, data]);
+        newSocket.on('response', (response) => {
+            console.log('Response from server:', response);
+            setMessages((prevMessages) => [...prevMessages, response]);
         });
 
         return () => {
             newSocket.disconnect();
         };
-    }, [selectedTeam]);
+    }, []);
 
     const handleSendMessage = () => {
         if (input.trim() && socket) {
@@ -78,23 +77,26 @@ const ChatWindow = ({ selectedTeam }) => {
                 <>
                     <h2>{selectedTeam.name} - Chat</h2>
                     <div className="messages">
-                        {messages.map((msg, index) => (
-                            <div key={index} className="message">
-                                {/* Affichez les messages ou réponses */}
-                                {msg.type === "list" ? (
-                                    <div>
-                                        <strong>Channels:</strong>
-                                        <ul>
-                                            {msg.channels.map((channel, idx) => (
-                                                <li key={idx}>{channel}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ) : (
-                                    msg.text ? msg.text : msg.message || "Message inconnu"
-                                )}
-                            </div>
-                        ))}
+                        {messages.length === 0 ? (
+                            <p>No messages yet. Try sending a command like /list</p>
+                        ) : (
+                            messages.map((msg, index) => (
+                                <div key={index} className="message">
+                                    {msg.type === "list" ? (
+                                        <div>
+                                            <strong>Channels:</strong>
+                                            <ul>
+                                                {msg.channels.map((channels, idx) => (
+                                                    <li key={idx}>{channels}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ) : (
+                                        msg.text || msg.message || "Message inconnu"
+                                    )}
+                                </div>
+                            ))
+                        )}
                     </div>
                     <div className="message-input">
                         <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
@@ -124,7 +126,32 @@ const ChatWindow = ({ selectedTeam }) => {
                     </div>
                 </>
             ) : (
-                <p>Please select a team to view and send messages.</p>
+                <>
+                    <h2>Welcome to the Chat</h2>
+                    <p>To get started, select a team to view the chat.</p>
+                    <p>Or type a command like <code>/list</code> to view available channels.</p>
+                    <div className="messages">
+                        {messages.length === 0 ? (
+                            <p>No messages yet. Type a command to interact.</p>
+                        ) : (
+                            messages.map((msg, index) => (
+                                <div key={index} className="message">
+                                    {msg.text || msg.message || "Message inconnu"}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                    <div className="message-input">
+                        <input
+                            type="text"
+                            placeholder="Type a command like /list"
+                            value={input}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown} // Ajout de l'écouteur pour la touche Entrée
+                        />
+                        <button onClick={handleSendMessage}>Send</button>
+                    </div>
+                </>
             )}
         </div>
     );
