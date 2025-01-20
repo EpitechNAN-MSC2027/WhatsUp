@@ -1,5 +1,6 @@
 import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
+import {addUserToChannel} from "../services/channelServices.js";
 
 /**
  * Socket success Response template
@@ -48,7 +49,7 @@ export async function defineNickname(socket, nickname) {
 
     try {
         //const newNickname = await process.updateNickname(nickname);
-        await userService.updateNickname(nickname);
+        await userService.updateNickname(socket.id, nickname);
         socket.nickname = nickname;
 
         await successResponse(
@@ -161,6 +162,15 @@ export async function joinChannel(socket, channel) {
     console.log(`Joining channel: ${channel}`);
 
     try {
+        await addUserToChannel(channel, socket.nickname);
+
+
+    } catch (error) {
+
+    }
+
+    try {
+
         socket.channel = await channelService.getChannel(channel);
         socket.join(socket.channel);
 
@@ -194,6 +204,7 @@ export async function quitChannel(socket, channel) {
     try {
         if (channelService.getChannel(channel)) {
             socket.channel = null;
+            socket.leave(channel);
 
             await successResponse(
                 socket,
