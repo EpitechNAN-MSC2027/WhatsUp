@@ -31,7 +31,9 @@ const ChatWindow = ({ selectedTeam }) => {
 
     const handleSendMessage = () => {
         if (input.trim() && socket) {
-            socket.emit('input', input);
+            socket.emit('input', {
+                data: input
+            });
             setInput('');
             setCommandSuggestions([]);
         }
