@@ -1,5 +1,5 @@
-import * as process from "./data_processing.js";
-import * as db from "../services/channelServices.js";
+import * as channelService from "../services/channelServices.js";
+import * as userService from "../services/userServices.js";
 
 /**
  * Socket success Response template
@@ -48,14 +48,14 @@ export async function defineNickname(socket, nickname) {
 
     try {
         //const newNickname = await process.updateNickname(nickname);
-        const newNickname = await db.updateNickname(nickname);
-        socket.nickname = newNickname;
+        await userService.updateNickname(nickname);
+        socket.nickname = nickname;
 
         await successResponse(
             socket,
             'nick',
             'Nickname defined successfully',
-            newNickname,
+            socket.nickname,
         );
     } catch (error) {
         await errorResponse(
@@ -77,11 +77,7 @@ export async function listChannels(socket, filter) {
     console.log('Listing channels');
 
     try {
-        if (filter) {
-            // Get filtered channels from db
-        }
-
-        const channels = await db.getAllChannels();
+        const channels = await channelService.getChannels(filter);
 
         await successResponse(
             socket,
@@ -109,7 +105,7 @@ export async function createChannel(socket, channel) {
     console.log(`Creating channel: ${channel}`);
 
     try {
-        const channel_created = await db.createChannel(channel, socket.nickname);
+        const channel_created = await channelService.createChannel(channel, socket.nickname);
 
         await successResponse(
             socket,
@@ -137,7 +133,7 @@ export async function deleteChannel(socket, channel) {
     console.log(`Deleting channel: ${channel}`);
 
     try {
-        await db.deleteChannel(channel);
+        await channelService.deleteChannel(channel);
 
         await successResponse(
             socket,
@@ -165,15 +161,18 @@ export async function joinChannel(socket, channel) {
     console.log(`Joining channel: ${channel}`);
 
     try {
-        socket.channel = await db.getChannel(channel);
+        socket.channel = await channelService.getChannel(channel);
+        socket.join(socket.channel);
 
         await successResponse(
             socket,
             'join',
-            'Successfully joined channel',
+            `Successfully joined channel ${socket.channel}`,
             socket.channel,
         )
     } catch (error) {
+        console.log(error);
+
         await errorResponse(
             socket,
             'join',
@@ -193,7 +192,7 @@ export async function quitChannel(socket, channel) {
     console.log(`Quitting channel: ${channel}`);
 
     try {
-        if (await db.getChannel(channel)) {
+        if (channelService.getChannel(channel)) {
             socket.channel = null;
 
             await successResponse(
@@ -204,10 +203,13 @@ export async function quitChannel(socket, channel) {
             )
         }
     } catch (error) {
+        console.log(error);
+
         await errorResponse(
             socket,
             'error',
-
+            `${error}`,
+            null,
         )
     }
 }
@@ -221,7 +223,7 @@ export async function listUsers(socket) {
     console.log('Listing users');
 
     try {
-        const users = await db.listUsers();
+        const users = await userService.getAllUsers();
 
         await successResponse(
             socket,
@@ -230,6 +232,8 @@ export async function listUsers(socket) {
             users,
         );
     } catch (error) {
+        console.log(error);
+
         await errorResponse(
             socket,
             'users',
@@ -241,6 +245,7 @@ export async function listUsers(socket) {
 
 /**
  * Private message to a specific User
+ * @param io
  * @param socket
  * @param user
  * @param message
@@ -258,8 +263,11 @@ export async function messageUser(io, socket, user, message) {
             socket,
             'msg',
             `Successfully send private message to ${user}`,
+            null,
         )
     } catch (error) {
+        console.log(error);
+
         await errorResponse(
             socket,
             'msg',
@@ -280,17 +288,30 @@ export async function sendMessage(io, socket, message) {
     console.log('message', message);
 
     try {
-        io.to(socket.channel).emit('message',
-            `${socket.nickname}: ${message}`,
-        );
+        if (socket.channel) {
+            io.to(socket.channel).emit('message',
+                `${socket.nickname}: ${message}`,
+            );
 
-        await successResponse(
-            socket,
-            'message',
-            `Message sent successfully in ${socket.channel}`,
-            null,
-        )
+            await successResponse(
+                socket,
+                'message',
+                `Message sent successfully in ${socket.channel}`,
+                null,
+            )
+        } else {
+            console.log("User not in a channel");
+
+            await errorResponse(
+                socket,
+                'message',
+                `You're not in a channel`,
+                null,
+            )
+        }
     } catch (error) {
+        console.log(error);
+
         await errorResponse(
             socket,
             'message',

@@ -1,4 +1,4 @@
-import db from "../app";
+import db from "../app.js";
 
 
 /**
@@ -7,13 +7,23 @@ import db from "../app";
  * @throws Error if no channels were found
  */
 export async function getChannels(filter) {
-    let regexPattern = `.* {${filter}}.*`
-    let res = await db.collection("channels").find({name: new RegExp(regexPattern)} ).toArray();
+    let res;
+    if (filter) {
+        let regexPattern = `.* {${filter}}.*`
+        res = await db.collection("channels")
+            .find({ name: new RegExp(regexPattern) }, { projection: { name: 1, _id: 0 } })
+            .toArray();
+    } else {
+        res = await db.collection("channels")
+            .find({}, { projection: { channelName: 1, _id: 0 } })
+            .toArray();
+    }
+
     if( res.length === 0 ) {
         throw new Error("No channels found");
     }
     else {
-        return res;
+        return res.map(channel => channel.channelName);
     }
 }
 
@@ -22,11 +32,11 @@ export async function getChannels(filter) {
  * @returns {String} the name of the channel
  */
 export async function getChannel(channelName) {
-    let res = await db.collection("channels").findOne({name: channelName});
-    if( res.length === 0 ) {
+    let res = await db.collection("channels").findOne({channelName: channelName});
+    if (!res) {
         throw new Error("Channel not found");
     }
-    return res.name;
+    return res.channelName;
 }
 
 /**
@@ -72,3 +82,6 @@ export async function createChannel(channelName, username) {
         throw new Error("Channel not created")
     }
 }
+
+// Need a function to join a channel and store joined channels in the db for each user,
+// because each user can join multiple channels at the same time (like on Discord)

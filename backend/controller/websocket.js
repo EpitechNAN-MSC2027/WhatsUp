@@ -1,7 +1,16 @@
 import {Server} from "socket.io";
 
 import * as commands from "./handleCommands.js";
+import * as userService from "../services/userServices.js";
+import {User} from "../models/user.js";
 
+
+/**
+ * Socket wrong args Response template
+ * @param socket
+ * @param action
+ * @returns {Promise<void>}
+ */
 async function wrongArgsResponse(socket, action) {
     socket.emit('response', {
         status: 'error',
@@ -27,7 +36,11 @@ export function createWebsocketServer(server) {
     // Handle connections
     io.on('connection', (socket) => {
         console.log(`Socket connected: ${socket.id}`);
-        
+
+        // Simulates user creation
+        userService.createUser(new User(socket.id, 'test', 'anonymous-user'));
+        socket.nickname = 'anonymous-user';
+
         socket.on('input', async (input) => {
             console.log(`Input: ${input}`);
 
@@ -40,7 +53,7 @@ export function createWebsocketServer(server) {
 
                 console.log(`Command: ${command}, Argument: ${args}`);
 
-                let channel, nickname, filter, user, message;
+                let channel, nickname, filter, user, message; // WIP: To handle better
                 // Switch statement to handle commands
                 switch (command) {
                     case 'nick':
