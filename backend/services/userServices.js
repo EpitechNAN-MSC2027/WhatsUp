@@ -53,10 +53,16 @@ export async function joinChannel(username, channel) {
  * Removes a channel from a user
  * @param username
  * @param channel
- * @returns {Promise<UpdateResult<Document>>}
+ * @returns {UpdateResult<Document>}
  */
 export async function leaveChannel(username, channel) {
-    return await db.collection("users").updateOne({username: username}, {$pull: {channels: channel}});
+    let res =  await db.collection("users").updateOne({username: username}, {$pull: {channels: channel}});
+    if (res.modifiedCount === 0) {
+        throw new Error("Channel not removed from user");
+    }
+    else{
+        return res.modifiedCount;
+    }
 }
 
 /**

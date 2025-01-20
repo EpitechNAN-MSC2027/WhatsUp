@@ -57,7 +57,7 @@ export async function getMessagesFromChannelPaginated(channel, page, pageSize) {
  */
 export async function deleteMessage(message) {
     let result = await db.collection("messages").deleteOne(message);
-    if (!result.acknowledged){
+    if (result.deletedCount === 0 || !result.acknowledged){
         throw new Error("Message not deleted");
     }
 }
