@@ -1,0 +1,43 @@
+.emoji-picker-component {
+    position: relative;
+}
+
+
+.emoji-picker {
+    position: absolute;
+    bottom: 40px;
+    left: 0;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.emoji-picker-component button {
+    padding: 10px 35px 10px 8px;
+    background-color: #ffff;
+    color: #ffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 0;
+    margin-right: -14px;
+}
+
+.pick button {
+    padding: 10px 35px 10px 8px;
+    background-color: #ffff;
+    color: #ffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 0;
+    margin-right: -14px;
+}
+
+.emoji-picker-component button:hover {
+    background-color: #c26c70;
+}
+

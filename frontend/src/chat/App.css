@@ -1,0 +1,150 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
+h3 {
+    margin:0 0 10px 0;
+    font-family: "Playwrite AU SA", serif;
+    font-size: 1.6rem;
+    color:#5ab6db;
+}
+
+h2 {
+    font-family: "Playwrite AU SA", serif;
+    margin:0 0 15px 10px;
+    font-size: 1.9rem;
+    color:#f4c4ba;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+    margin:0;
+    font-size: 1.2rem;
+}
+
+.right-sidebar {
+    width: 10%;
+    background-color: #f4c7ba;
+    border-left: 1px solid #c26c70;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.sidebar {
+    width: 12%;
+    background-color: #dff2f9;
+    padding: 10px;
+    border: 7px solid #5ab6db;
+    color:#9c6956;
+    font-family: "Josefin Sans", serif;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+}
+
+.sidebar li:hover {
+    background-color: #fbfefc;
+}
+
+.chat-window {
+    width: 74.2%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #fce9cb;
+    color:#9c6956;
+    font-size: 1.2rem;
+    border-radius: 15px;
+    font-family: "PT Serif", serif;
+    font-weight: 700;
+}
+
+.message {
+    padding: 5px 0;
+}
+
+.message-input {
+    display: flex;
+    height: 50px;
+}
+
+.message-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1.1rem;
+}
+
+.message-input button {
+    margin-left: 10px;
+    padding: 10px;
+    width: 7%;
+    background-color: #f4c7ba;
+    color: #c26c70;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.message-input button:hover {
+    background-color: #e6a5ab;
+}
+
+.command-suggestions {
+    position: absolute;
+    background-color: #f4c4ba;
+    max-height: 150px;
+    overflow-y: auto;
+    width: 75%;
+    z-index: 1;
+    bottom: 70px;
+}
+
+.command-suggestions ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.command-suggestions li {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.command-suggestions li:hover {
+    background-color: #c26c70;
+}
+
+
+.emoji-picker-component .pick button {
+    padding: 10px 35px 10px 8px;
+    background-color: #ffff;
+    color: #ffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 0;
+    margin-right: -14px;
+}
+
+.emoji-picker-component button:hover {
+    background-color: #c26c70;
+}

@@ -1,0 +1,63 @@
+.right-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background-color: #f4c7ba;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow-x:hidden;
+    overflow-y: auto;
+}
+
+/* Section Profil */
+.profile-section {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #c26c70;
+    height: 17%;
+}
+
+.avatar {
+    width: 250px;
+    height: 250px;
+    position: absolute;
+    margin-left: -40px;
+    margin-top: 40px;
+}
+
+.name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Section Membres */
+.members-section {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.members-section h4 {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.member-item span {
+    font-size: 16px;
+    color: #333;
+}
