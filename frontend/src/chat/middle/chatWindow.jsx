@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 import commands from './commands.jsx';
 import EmojiPickerComponent from "./emoji.jsx";
 
-
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]); // Messages reçus du serveur
@@ -34,8 +33,8 @@ const ChatWindow = ({ selectedTeam }) => {
             socket.emit('input', {
                 data: input
             });
-            setInput('');
-            setCommandSuggestions([]);
+            setInput(''); // Réinitialiser l'entrée
+            setCommandSuggestions([]); // Réinitialiser les suggestions de commandes
         }
     };
 
@@ -43,6 +42,7 @@ const ChatWindow = ({ selectedTeam }) => {
         const userInput = e.target.value;
         setInput(userInput);
 
+        // Gérer les suggestions de commandes si l'utilisateur tape "/"
         if (userInput.startsWith('/')) {
             const commandPrefix = userInput.slice(1).toLowerCase();
             const suggestions = Object.keys(commands)
@@ -50,18 +50,26 @@ const ChatWindow = ({ selectedTeam }) => {
                 .map(command => command);
             setCommandSuggestions(suggestions);
         } else {
-            setCommandSuggestions([]);
+            setCommandSuggestions([]); // Réinitialise les suggestions si ce n'est pas une commande
         }
     };
 
     const handleSuggestionClick = (command) => {
         setInput(`/${command}`);
-        setCommandSuggestions([]);
+        setCommandSuggestions([]); // Fermer les suggestions après la sélection
     };
 
     // Gestion de la sélection d'émojis
     const handleEmojiSelect = (emoji) => {
         setInput((prevInput) => prevInput + emoji); // Ajoute l'émoji au texte
+    };
+
+    // Gérer l'envoi du message lorsque la touche Entrée est pressée
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Empêche le comportement par défaut (saut de ligne)
+            handleSendMessage(); // Envoie le message
+        }
     };
 
     return (
@@ -95,6 +103,7 @@ const ChatWindow = ({ selectedTeam }) => {
                             placeholder="Type a message, e.g., /list or Hello!"
                             value={input}
                             onChange={handleInputChange}
+                            onKeyDown={handleKeyDown} // Ajout de l'écouteur pour la touche Entrée
                         />
                         <button onClick={handleSendMessage}>Send</button>
                         {commandSuggestions.length > 0 && (
