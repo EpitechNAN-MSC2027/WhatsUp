@@ -15,11 +15,12 @@ const SignUpForm = ({ switchToSignIn }) => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000', {
+            const response = await fetch('http://localhost:3000/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
+            console.log(response.body)
 
             const result = await response.json();
             if (result.success) {

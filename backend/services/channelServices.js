@@ -133,3 +133,16 @@ export async function getChannelUsers(channelName) {
     }
     return res.users;
 }
+
+/**
+ * Gets the creator of a channel
+ * @param username
+ * @returns
+ */
+export async function getChannelsCreated(username) {
+    let res = await db.collection("channels").find({administrator: username});
+    if( res.length === 0 ) {
+        throw new Error("Channel not found");
+    }
+    return await res.toArray();
+}

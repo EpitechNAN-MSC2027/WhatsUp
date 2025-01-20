@@ -9,13 +9,17 @@ const SignInForm = ({ switchToSignUp, navigateToChat }) => {
         const password = formData.get('password');
 
         try {
-            const response = await fetch('http://localhost:3000/register', {
+            const response = await fetch('http://localhost:3000/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
 
             const result = await response.json();
+            console.log(result);
+
+            document.cookie = 'token=' + result.token;
+
             if (result.success) {
                 navigateToChat();
             } else {
