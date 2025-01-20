@@ -16,7 +16,6 @@ export function hashPassword(password){
     return crypto.createHash('sha256').update(password).digest('hex');
 }
 
-
 /**
  * Creates a jwt token containing the channels the user administrates
  * @param channelsAdmin
@@ -65,7 +64,6 @@ export async function registerUser(username, password, nickname) {
     let insertResponse = await db.collection("users").insertOne(user.toConst());
     return insertResponse.acknowledged;
 }
-
 
 /**
  * Decodes the jwt token into Json format
