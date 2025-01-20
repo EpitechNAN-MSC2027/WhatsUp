@@ -20,6 +20,3 @@ jobs:
             git@github.com:EpitechMscProPromo2027/T-JSF-600-NAN_10.git
           ssh_private_key:
               ${{ secrets.SSH_SECRET }}
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.

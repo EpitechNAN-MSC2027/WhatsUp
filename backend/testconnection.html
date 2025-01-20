@@ -5,47 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Socket.IO Example</title>
     <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+        }
+
+        #leftPanel, #rightPanel {
+            width: 25%;
+            background-color: #f1f1f1;
+            overflow-y: auto;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        #rightPanel {
+            border-left: 1px solid #ccc;
+            border-right: none;
+        }
+
+        #centerPanel {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
-    <h1>Socket.IO Frontend</h1>
-
-    <div>
-        <label for="inputField">Enter command or message:</label>
-        <input type="text" id="inputField" placeholder="Type something, e.g., /list or Hello!" />
-        <button id="sendButton">Send</button>
+    <div id="leftPanel">
+        <h2>Joined Channels</h2>
+        <ul id="channelList"></ul>
     </div>
 
-    <div id="output">
-        <h2>Output:</h2>
-        <pre id="outputArea"></pre>
+    <div id="centerPanel">
+        <div>
+            <label for="inputField">Enter command or message:</label>
+            <input type="text" id="inputField" placeholder="Type something, e.g., /list or Hello!" />
+            <button id="sendButton">Send</button>
+        </div>
+        <div id="output">
+            <h2>Output:</h2>
+            <pre id="outputArea"></pre>
+        </div>
+    </div>
+
+    <div id="rightPanel">
+        <h2>Users in Channel</h2>
+        <ul id="userList"></ul>
     </div>
 </body>
 <script>
     // Connect to the server
     const socket = io('http://localhost:3000');
+    const inputField = document.getElementById('inputField');
+    const outputArea = document.getElementById('outputArea');
+    const channelList = document.getElementById('channelList');
+    const userList = document.getElementById('userList');
 
     // Log connection status
     socket.on('connect', () => {
         console.log('Connected to server:', socket.id);
     });
 
-    // Listen for server responses
-    socket.on('response', (data) => {
-        console.log('Response from server:', data);
-
-        // Display the server's response in the output area
-        const outputArea = document.getElementById('outputArea');
-        outputArea.textContent += `\n${JSON.stringify(data, null, 2)}`;
-    });
-
     // Handle command input
     document.getElementById('sendButton').addEventListener('click', () => {
-        const inputField = document.getElementById('inputField');
         const input = inputField.value.trim();
 
-        socket.emit('input', input);
+        socket.emit('input', {
+            data: input,
+            // token: token,
+            timestamp: new Date().toISOString(),
+        });
 
         inputField.value = ''; // Clear the input field
+    });
+
+    // Listen for server responses
+    socket.on('response', (response) => {
+        if (response.status === 'error') {
+            outputArea.textContent += `Error on ${response.action}: ${response.message}\n`;
+        }
+
+        if (response.status === 'success') {
+            switch (response.action) {
+                case 'message':
+                    console.log(response.message);
+                    break;
+
+                case 'nick':
+                    outputArea.textContent += `${response.message}: ${response.data}\n`;
+                    break;
+
+                case 'list':
+                    outputArea.textContent += `${response.message}:\n`;
+                    console.log(response.data);
+                    for (let channel_id in response.data) {
+                        console.log(response.data[channel_id]);
+                        outputArea.textContent += `${response.data[channel_id]}\n`;
+                    }
+                    break;
+
+                case 'create':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'delete':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'join':
+                    outputArea.textContent += `${response.message}\n`;
+                    const joinedChannel = Array.from(channelList.children).find(
+                        (item) => item.textContent === response.data
+                    );
+                    break;
+
+                case 'quit':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'users':
+                    outputArea.textContent += `${response.message}\n${response.data}\n`;
+                    break;
+
+                case 'msg':
+                    outputArea.textContent += `${response.message}\n`;
+                    break;
+
+                case 'error':
+                    outputArea.textContent += `${response.data}\n`;
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        console.log('Response from server:', response);
+        // outputArea.textContent += `\n${JSON.stringify(data, null, 2)}`;
+    });
+
+    socket.on('message', (message) => {
+        console.log('message received: ', message);
+        outputArea.textContent += `${message}\n`;
     });
 </script>
 </html>
