@@ -1,6 +1,4 @@
-import {Channel} from "./channel";
-
-class User {
+export class User {
     constructor(username, password, nickname){
         this.username = username;
         this.password = password;
