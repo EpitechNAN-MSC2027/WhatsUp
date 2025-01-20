@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import commands from './commands.jsx';
+import EmojiPickerComponent from "./emoji.jsx";
+
 
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
@@ -55,6 +57,11 @@ const ChatWindow = ({ selectedTeam }) => {
         setCommandSuggestions([]);
     };
 
+    // Gestion de la sélection d'émojis
+    const handleEmojiSelect = (emoji) => {
+        setInput((prevInput) => prevInput + emoji); // Ajoute l'émoji au texte
+    };
+
     return (
         <div className="chat-window">
             {selectedTeam ? (
@@ -80,6 +87,7 @@ const ChatWindow = ({ selectedTeam }) => {
                         ))}
                     </div>
                     <div className="message-input">
+                        <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
                         <input
                             type="text"
                             placeholder="Type a message, e.g., /list or Hello!"
