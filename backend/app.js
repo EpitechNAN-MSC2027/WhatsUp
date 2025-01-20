@@ -14,7 +14,7 @@ createWebsocketServer(server);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.get('/', (req, res) => {
-    res.sendFile(join(__dirname, '../frontend/index.html'));
+    res.sendFile(join(__dirname, 'testconnection.html'));
 });
 
 server.listen(3000, () => {
