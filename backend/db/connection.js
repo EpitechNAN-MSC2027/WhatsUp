@@ -3,14 +3,18 @@ import {MongoClient} from "mongodb";
 const connectionString = "mongodb://root:example@localhost:27017";
 
 export async function connectDB() {
+    console.log("Connecting to database...");
     const client = new MongoClient(connectionString);
-    let conn;
+    console.log(`MongoClient created`);
     try {
-        conn = await client.connect();
+        console.log("Connecting to client...");
+        let conn = await client.connect();
+        console.log("Connected to client");
+
+        return conn.db("IRCEpitech");
     } catch(e) {
         console.error(e);
     }
-    return conn.db("IRCEpitech");
 }
 
 export default connectDB;
