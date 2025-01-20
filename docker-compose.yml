@@ -3,6 +3,25 @@ version: '3.1'
 
 services:
 
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+        - "3000:3000"
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+        - "5000:5000"
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URL: mongodb://root:example@mongo:27017/
+      MONGO_DB_NAME: mydb
+
   mongo:
     image: mongo
     restart: always
