@@ -17,8 +17,8 @@
 
 .emoji-picker-component button {
     padding: 10px 35px 10px 8px;
-    background-color: #ffff;
-    color: #ffff;
+    background-color: #ECE9CA;
+    color: #ECE9CA;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -26,18 +26,12 @@
     margin-right: -14px;
 }
 
-.pick button {
-    padding: 10px 35px 10px 8px;
-    background-color: #ffff;
-    color: #ffff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 0;
-    margin-right: -14px;
-}
 
-.emoji-picker-component button:hover {
-    background-color: #c26c70;
+.message-input input {
+    flex: 1;
+    margin-left: 30px;
+    width: 250px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: black;
 }
-

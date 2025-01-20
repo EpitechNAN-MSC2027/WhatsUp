@@ -134,17 +134,17 @@ h2 {
 }
 
 
-.emoji-picker-component .pick button {
-    padding: 10px 35px 10px 8px;
-    background-color: #ffff;
+.emoji-picker-component button {
+    padding: 10px 15px 10px 15px;
+    background-color: transparent;
     color: #ffff;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     margin-left: 0;
-    margin-right: -14px;
+    margin-right: -4px;
 }
 
 .emoji-picker-component button:hover {
-    background-color: #c26c70;
+    background-color: transparent;
 }
