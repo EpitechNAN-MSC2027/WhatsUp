@@ -46,13 +46,13 @@ export async function getChannel(channelName) {
  */
 export async function deleteChannel(name)  {
     let channelResponse = await db.collection("channels").deleteOne({name: name});
-    if (!channelResponse.acknowledged) {
+    if (channelResponse.deletedCount === 0) {
         throw new Error("Channel not found")
     }
-    let deletedCount =  (await db.collection("messages").deleteMany({channel: name})).deletedCount;
+    let deletedMessagesCount =  (await db.collection("messages").deleteMany({channel: name})).deletedCount;
 
     console.log("Channel deleted");
-    console.log("Messages deleted : " + deletedCount);
+    console.log("Messages deleted : " + deletedMessagesCount);
 }
 
 /**
@@ -93,6 +93,10 @@ export async function addUserToChannel(channelName, username) {
     let res = await db.collection("channels").findOne({name: channelName});
     if( res.length === 0 ) {
         throw new Error("Channel not found");
+    }
+    let isUserPresent = res.users.includes(username);
+    if (isUserPresent) {
+        throw new Error("User already in channel");
     }
     let updateResponse = await db.collection("channels").updateOne({name: channelName}, {$push: {users: username}});
     if (!updateResponse.acknowledged) {
