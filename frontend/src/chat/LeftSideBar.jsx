@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Sidebar = ({ teams, onTeamSelect, onAddTeam }) => {
+const LeftSideBar = ({ teams, onTeamSelect, onAddTeam }) => {
     const [newChannelName, setNewChannelName] = useState("");
 
     const handleAddChannel = () => {
@@ -25,4 +25,4 @@ const Sidebar = ({ teams, onTeamSelect, onAddTeam }) => {
     );
 };
 
-export default Sidebar;
+export default LeftSideBar;
