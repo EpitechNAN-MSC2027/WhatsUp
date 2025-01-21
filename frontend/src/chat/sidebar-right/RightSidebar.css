@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
+
 .right-sidebar {
     position: fixed;
     top: 0;
@@ -27,27 +29,27 @@
     margin-top: 40px;
 }
 
-.name {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
+
 
 /* Section Membres */
 .members-section {
     flex-grow: 1;
-    padding: 20px;
+    padding: 4px;
+    margin-top: 10px;
 }
 
 .members-section h4 {
-    margin-bottom: 10px;
-    color: #555;
+    margin-bottom: 1px;
+    color: #5A97BB;
+    font-family: "Josefin Sans", serif;
+    margin-top: 4px;
+    font-size: 1.5rem;
 }
 
 .member-item {
     display: flex;
-    align-items: center;
     margin-bottom: 10px;
+    border:2px solid red;
 }
 
 .member-avatar {

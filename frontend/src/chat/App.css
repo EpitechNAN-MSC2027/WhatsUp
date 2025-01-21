@@ -20,6 +20,10 @@ h2 {
     font-size: 1.2rem;
 }
 
+ul {
+    padding-inline-start: 17px;
+}
+
 .right-sidebar {
     width: 10%;
     background-color: #f4c7ba;
@@ -147,4 +151,11 @@ h2 {
 
 .emoji-picker-component button:hover {
     background-color: transparent;
+}
+
+.name {
+    margin-top: -10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #5A97BB;
 }
