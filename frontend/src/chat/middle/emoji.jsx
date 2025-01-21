@@ -6,15 +6,13 @@ const EmojiPickerComponent = ({ onEmojiSelect }) => {
     const [showPicker, setShowPicker] = useState(false);
 
     const handleEmojiClick = (emojiData) => {
-        onEmojiSelect(emojiData.emoji); // Appelle la fonction parent pour ajouter l'émoji
-        setShowPicker(false); // Ferme le picker après la sélection
+        onEmojiSelect(emojiData.emoji);
+        setShowPicker(false);
     };
 
     return (
         <div className="emoji-picker-component">
-            <div className="pick">
                 <button className="pick" onClick={() => setShowPicker(!showPicker)}>😀</button>
-            </div>
             {showPicker && (
                 <div className="emoji-picker">
                 <EmojiPicker onEmojiClick={handleEmojiClick} />
