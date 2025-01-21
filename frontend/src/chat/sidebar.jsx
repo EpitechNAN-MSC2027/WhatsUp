@@ -16,20 +16,11 @@ const Sidebar = ({ teams, onTeamSelect, onAddTeam }) => {
             <ul>
                 {teams.map((team, index) => (
                     <li key={index} onClick={() => onTeamSelect(team)}>
-                        {team.channelName} {/* Utilisez channelName pour correspondre au backend */}
+                        {team.channelName}
                     </li>
                 ))}
             </ul>
 
-            <div className="add-channel">
-                <input
-                    type="text"
-                    placeholder="New channel"
-                    value={newChannelName}
-                    onChange={(e) => setNewChannelName(e.target.value)}
-                />
-                <button onClick={handleAddChannel}>Add</button>
-            </div>
         </div>
     );
 };
