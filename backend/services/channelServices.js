@@ -1,4 +1,5 @@
 import db from "../app.js";
+import {isUserAuthorizedOnChannel} from "./authentication.js";
 
 
 /**
@@ -41,18 +42,23 @@ export async function getChannel(channelName) {
 
 /**
  * Deletes a Channel and all messages associated with it
- * @param name
+ * @param token
+ * @param channelName
  * @throws an error if the channel was not found
  */
-export async function deleteChannel(name)  {
-    let channelResponse = await db.collection("channels").deleteOne({name: name});
-    if (channelResponse.deletedCount === 0) {
-        throw new Error("Channel not found")
-    }
-    let deletedMessagesCount =  (await db.collection("messages").deleteMany({channel: name})).deletedCount;
+export async function deleteChannel(token, channelName)  {
+    if (isUserAuthorizedOnChannel(token, channelName)) {
+        let channelResponse = await db.collection("channels").deleteOne({name: name});
+        if (channelResponse.deletedCount === 0) {
+            throw new Error("Channel not found")
+        }
+        let deletedMessagesCount =  (await db.collection("messages").deleteMany({channel: name})).deletedCount;
 
-    console.log("Channel deleted");
-    console.log("Messages deleted : " + deletedMessagesCount);
+        console.log("Channel deleted");
+        console.log("Messages deleted : " + deletedMessagesCount);
+    } else {
+        return new Error("Unauthorized operation: you are not the admin of the channel.");
+    }
 }
 
 /**

@@ -127,14 +127,15 @@ export async function createChannel(socket, channel) {
 /**
  * Delete an existing Channel
  * @param socket
+ * @param token
  * @param channel
  * @returns {Promise<void>}
  */
-export async function deleteChannel(socket, channel) {
+export async function deleteChannel(socket, token, channel) {
     console.log(`Deleting channel: ${channel}`);
 
     try {
-        await channelService.deleteChannel(channel);
+        await channelService.deleteChannel(token, channel);
 
         await successResponse(
             socket,
