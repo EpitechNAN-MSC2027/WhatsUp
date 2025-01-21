@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import commands from './commands.jsx';
-import EmojiPickerComponent from "./emoji.jsx";
+import EmojiPickerComponent from './emoji.jsx';
 
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
@@ -9,6 +9,7 @@ const ChatWindow = ({ selectedTeam }) => {
     const [input, setInput] = useState(""); // Message à envoyer
     const [commandSuggestions, setCommandSuggestions] = useState([]); // Suggestions de commandes
     const [channels, setChannels] = useState([]); // Liste des canaux
+    const messagesEndRef = useRef(null); // Référence pour le conteneur des messages
 
     useEffect(() => {
         if (!selectedTeam) return;
@@ -21,7 +22,6 @@ const ChatWindow = ({ selectedTeam }) => {
 
         newSocket.on('connect', () => {
             console.log('Connected to server:', newSocket.id);
-
         });
 
         newSocket.on('response', (response) => {
@@ -36,6 +36,18 @@ const ChatWindow = ({ selectedTeam }) => {
             newSocket.disconnect();
         };
     }, [selectedTeam]);
+
+    // Fonction pour gérer le défilement
+    const scrollToBottom = () => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    // Défilement automatique chaque fois que les messages changent
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     const handleSendMessage = () => {
         if (input.trim() && socket) {
@@ -53,8 +65,8 @@ const ChatWindow = ({ selectedTeam }) => {
         if (userInput.startsWith('/')) {
             const commandPrefix = userInput.slice(1).toLowerCase();
             const suggestions = Object.keys(commands)
-                .filter(command => command.startsWith(commandPrefix))
-                .map(command => command);
+                .filter((command) => command.startsWith(commandPrefix))
+                .map((command) => command);
             setCommandSuggestions(suggestions);
         } else {
             setCommandSuggestions([]); // Réinitialise les suggestions si ce n'est pas une commande
@@ -84,11 +96,11 @@ const ChatWindow = ({ selectedTeam }) => {
             {selectedTeam ? (
                 <>
                     <h2>{selectedTeam.name} - Chat</h2>
-                    <div className="messages">
+                    <div className="messages" style={{overflowY: 'auto' }}>
                         {messages.map((msg, index) => (
                             <div key={index} className="message">
                                 {/* Affichez les messages ou réponses */}
-                                {msg.action === "list" ? (
+                                {msg.action === 'list' ? (
                                     <div>
                                         <strong>Channels:</strong>
                                         <ul>
@@ -98,10 +110,12 @@ const ChatWindow = ({ selectedTeam }) => {
                                         </ul>
                                     </div>
                                 ) : (
-                                    msg.text ? msg.text : msg.message || "Message inconnu"
+                                    msg.text ? msg.text : msg.message || 'Message inconnu'
                                 )}
                             </div>
                         ))}
+                        {/* Élément caché pour ancrer le défilement */}
+                        <div ref={messagesEndRef} />
                     </div>
                     <div className="message-input">
                         <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />

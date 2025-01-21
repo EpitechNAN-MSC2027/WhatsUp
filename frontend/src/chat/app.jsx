@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Sidebar from './sidebar.jsx';
+import LeftSideBar from './LeftSideBar.jsx';
 import ChatWindow from './middle/chatWindow.jsx';
 import RightSidebar from './sidebar-right/RightSidebar'; // Importez RightSidebar
 import './App.css';
@@ -26,7 +26,7 @@ const App = () => {
 
     return (
         <div className="app-container">
-            <Sidebar teams={teams} onTeamSelect={setSelectedTeam} />
+            <LeftSideBar teams={teams} onTeamSelect={setSelectedTeam} />
             <ChatWindow selectedTeam={selectedTeam} />
             <RightSidebar profile={profile} members={members} />
         </div>
