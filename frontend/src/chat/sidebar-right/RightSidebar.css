@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=La+Belle+Aurore&family=Sniglet:wght@400;800&display=swap');
+
 .right-sidebar {
     position: fixed;
     top: 0;
@@ -20,34 +23,35 @@
 }
 
 .avatar {
-    width: 250px;
-    height: 250px;
+    width: 200px;
+    height: 200px;
     position: absolute;
-    margin-left: -40px;
+    margin-left: -30px;
     margin-top: 40px;
 }
 
-.name {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-}
+
 
 /* Section Membres */
 .members-section {
     flex-grow: 1;
-    padding: 20px;
+    padding: 4px;
+    margin-top: 10px;
 }
 
 .members-section h4 {
-    margin-bottom: 10px;
-    color: #555;
+    margin-bottom: 1px;
+    color: #5A97BB;
+    font-family: "Josefin Sans", serif;
+    margin-top: 4px;
+    font-size: 1.5rem;
 }
 
 .member-item {
     display: flex;
-    align-items: center;
     margin-bottom: 10px;
+    font-family: "Sniglet", serif;
+    color:#9c6956;
 }
 
 .member-avatar {
