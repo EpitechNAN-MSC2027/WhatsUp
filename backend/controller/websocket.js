@@ -1,9 +1,10 @@
 import {Server} from "socket.io";
-
+import * as auth from"../services/authentication.js"
 import * as commands from "./handleCommands.js";
 import * as userService from "../services/userServices.js";
 import {User} from "../models/user.js";
-
+import jwt from "jsonwebtoken";
+import {connectChannel, retrieveUser} from "./handleCommands.js";
 
 /**
  * Socket wrong args Response template
@@ -32,13 +33,42 @@ export function createWebsocketServer(server) {
         }
     });
 
+    io.use((socket, next) => {
+        const token = socket.handshake.auth.token || socket.handshake.query.token; // From handshake auth or query
+        if (!token) {
+            return next(new Error('Authentication error: Token required'));
+        }
+
+        try {
+            //socket.user = auth.decodeToken(token);
+            jwt.verify(token, 'secret');
+            next(); // Allow the connection
+        } catch (err) {
+            next(new Error('Authentication error: Invalid token'));
+        }
+    });
+
     // Handle connections
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
         console.log(`Socket connected: ${socket.id}`);
 
-        // Simulates user creation
-        userService.createUser(new User(socket.id, 'test', 'anonymous-user'));
-        socket.nickname = 'anonymous-user';
+        // Save token on socket connection
+        socket.token = socket.handshake.auth.token || socket.handshake.query.token;
+
+        // Build socket.user
+        const payload = auth.decodeToken(socket.token);
+        socket.user = await commands.retrieveUser(payload.username);
+        socket.user.channelsAdmin = payload.channelsAdmin;
+
+        // Send user channels to client
+        socket.emit('channels', socket.user.channels);
+        socket.join("general");
+
+        console.log(socket.user);
+
+        socket.on('move', async (channel) => {
+            await commands.connectChannel(socket, channel);
+        })
 
         socket.on('input', async (input) => {
             console.log(`Input: ${input}`);
@@ -92,7 +122,7 @@ export function createWebsocketServer(server) {
                         }
 
                         channel = args[0];
-                        await commands.deleteChannel(socket, channel);
+                        await commands.deleteChannel(socket, token, channel);
                         break;
 
                     case 'join':

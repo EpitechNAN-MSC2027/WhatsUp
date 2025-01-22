@@ -13,8 +13,11 @@ const ChatWindow = ({ selectedTeam }) => {
 
     useEffect(() => {
         if (!selectedTeam) return;
-
-        const newSocket = io('http://localhost:3000');
+        const newSocket = io('http://localhost:3000', {
+            auth: {
+                token: localStorage.getItem('token'),
+            }
+        });
         setSocket(newSocket);
 
         newSocket.on('connect', () => {
