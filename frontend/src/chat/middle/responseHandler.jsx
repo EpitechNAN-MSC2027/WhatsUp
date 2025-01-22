@@ -1,59 +1,38 @@
-// responseHandler.js
+export const handleCommand = (response) => {
+    let output = "";
+    let data = null;
 
-// Cette fonction gère les différentes actions de réponse
-export const handleServerResponse = (response, setMessages, setChannelList, setUserList) => {
-    if (response.status === 'error') {
-        setMessages((prevMessages) => [
-            ...prevMessages,
-            { message: `Error on ${response.action}: ${response.message}`, type: 'error' },
-        ]);
-    }
-
-    if (response.status === 'success') {
+    if (response.status === "error") {
+        output = `Error on ${response.action}: ${response.message}`;
+    } else if (response.status === "success") {
         switch (response.action) {
-            case 'message':
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { message: response.message, type: 'message' },
-                ]);
+            case "message":
+                output = response.message;
                 break;
 
-            case 'nick':
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { message: `${response.message}: ${response.data}`, type: 'nick' },
-                ]);
+            case "nick":
+                output = `${response.message}: ${response.data}`;
                 break;
 
-            case 'list':
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { message: `${response.message}:`, type: 'list', channels: response.data },
-                ]);
-                setChannelList(response.data); // Mettez à jour la liste des canaux
+            case "list":
+                output = `${response.message}:\n`;
+                data = response.action; // Liste des canaux
                 break;
 
-            case 'create':
-            case 'delete':
-            case 'join':
-            case 'quit':
-            case 'msg':
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { message: response.message, type: response.action },
-                ]);
-                break;
-
-            case 'users':
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { message: `${response.message}: ${response.data}`, type: 'users' },
-                ]);
-                setUserList(response.data); // Mettez à jour la liste des utilisateurs
+            case "create":
+            case "delete":
+            case "join":
+            case "quit":
+            case "users":
+            case "msg":
+                output = `${response.message}`;
                 break;
 
             default:
+                output = "Unknown command";
                 break;
         }
     }
+
+    return { output, data };
 };

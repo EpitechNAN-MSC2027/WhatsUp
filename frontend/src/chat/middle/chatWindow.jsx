@@ -3,6 +3,12 @@ import io from 'socket.io-client';
 import commands from './commands.jsx';
 import EmojiPickerComponent from './emoji.jsx';
 
+/**
+ *
+ * @param selectedTeam
+ * @returns {Element}
+ * @constructor
+ */
 const ChatWindow = ({ selectedTeam }) => {
     const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]); // Messages reçus du serveur
@@ -34,7 +40,7 @@ const ChatWindow = ({ selectedTeam }) => {
         };
     }, [selectedTeam]);
 
-    // Fonction pour gérer le défilement
+        //Fonction pour gérer le défilement
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -48,11 +54,14 @@ const ChatWindow = ({ selectedTeam }) => {
 
     const handleSendMessage = () => {
         if (input.trim() && socket) {
-            socket.emit('input', { data: input });
+            const newMessage = { text: input, action: 'sent' }; // Crée un message avec le texte et une action
+            setMessages((prevMessages) => [...prevMessages, newMessage]); // Ajoute localement le message
+            socket.emit('input', { data: input }); // Envoie le message au serveur
             setInput(''); // Réinitialiser l'entrée
             setCommandSuggestions([]); // Réinitialiser les suggestions de commandes
         }
     };
+
 
     const handleInputChange = (e) => {
         const userInput = e.target.value;
