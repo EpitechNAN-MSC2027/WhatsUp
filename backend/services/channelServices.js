@@ -96,15 +96,17 @@ export async function createChannel(channelName, username) {
  * @returns {Promise<void>}
  */
 export async function addUserToChannel(channelName, username) {
-    let res = await db.collection("channels").findOne({name: channelName});
-    if( res.length === 0 ) {
+    let res = await db.collection("channels").findOne({channelName: channelName});
+    console.log("res:", res);
+    if (!res) {
         throw new Error("Channel not found");
     }
     let isUserPresent = res.users.includes(username);
     if (isUserPresent) {
         throw new Error("User already in channel");
     }
-    let updateResponse = await db.collection("channels").updateOne({name: channelName}, {$push: {users: username}});
+    let updateResponse = await db.collection("channels").updateOne({channelName: channelName}, {$push: {users: username}});
+    console.log(updateResponse);
     if (!updateResponse.acknowledged) {
         throw new Error("User not added to channel")
     }

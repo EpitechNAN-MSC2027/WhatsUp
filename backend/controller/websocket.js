@@ -4,6 +4,7 @@ import * as commands from "./handleCommands.js";
 import * as userService from "../services/userServices.js";
 import {User} from "../models/user.js";
 import jwt from "jsonwebtoken";
+import {connectChannel, retrieveUser} from "./handleCommands.js";
 
 /**
  * Socket wrong args Response template
@@ -48,11 +49,26 @@ export function createWebsocketServer(server) {
     });
 
     // Handle connections
-    io.on('connection', (socket) => {
+    io.on('connection', async (socket) => {
         console.log(`Socket connected: ${socket.id}`);
 
         // Save token on socket connection
         socket.token = socket.handshake.auth.token || socket.handshake.query.token;
+
+        // Build socket.user
+        const payload = auth.decodeToken(socket.token);
+        socket.user = await commands.retrieveUser(payload.username);
+        socket.user.channelsAdmin = payload.channelsAdmin;
+
+        // Send user channels to client
+        socket.emit('channels', socket.user.channels);
+        socket.join("general");
+
+        console.log(socket.user);
+
+        socket.on('move', async (channel) => {
+            await commands.connectChannel(socket, channel);
+        })
 
         socket.on('input', async (input) => {
             console.log(`Input: ${input}`);
