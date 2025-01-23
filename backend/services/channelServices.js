@@ -79,7 +79,7 @@ export async function createChannel(channelName, username) {
     // create the channel
     let channel = {
         channelName : channelName,
-        username : username,
+        admin : username,
         users : [username]
     }
 
@@ -97,7 +97,6 @@ export async function createChannel(channelName, username) {
  */
 export async function addUserToChannel(channelName, username) {
     let res = await db.collection("channels").findOne({channelName: channelName});
-    console.log("res:", res);
     if (!res) {
         throw new Error("Channel not found");
     }

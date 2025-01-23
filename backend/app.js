@@ -32,20 +32,22 @@ app.post("/login", async (req, res) => {
     console.log(username, password);
 
     let user = await getUser(username);
-    if ((user["password"] !== hashPassword(password))) {
+
+    if (!user || (user["password"] !== hashPassword(password))) {
         return res.status(401).json({success: false, message: "Invalid email or password"});
-    } else {
-        let channels = await getChannelsCreated(username)
-        console.log(channels);
-        let jwt = createToken(channels, username);
-        return res.status(200).json({success: true, message: "Login successful", token: jwt});
     }
+
+    let channels = await getChannelsCreated(username)
+    console.log(channels);
+    let jwt = createToken(channels, username);
+    return res.status(200).json({success: true, message: "Login successful", token: jwt});
+
 });
 
 app.post("/register", (req, res) => {
     const {username, password, confirmPassword} = req.body;
     console.log(username, password, confirmPassword);
-    registerUser(username, password, "").then(r => {
+    registerUser(username, password, username).then(r => {
         if (r) {
             return res.status(201).json({success: true, message: "User registered"});
         }
