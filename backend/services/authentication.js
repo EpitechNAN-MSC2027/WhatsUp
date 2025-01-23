@@ -70,7 +70,7 @@ export async function registerUser(username, password, nickname) {
  * @param token the jwt
  * @returns {{payload: *, signature: *, header: *}|*}
  */
-function decodeToken(token){
+export function decodeToken(token) {
     return jwt.decode(token, secretKey);
 }
 
@@ -80,7 +80,7 @@ function decodeToken(token){
  * @param channel the targeted channel
  * @returns {boolean} true if the user is an admin of the channel
  */
-function isUserAuthorizedOnChannel(token, channel){
+export function isUserAuthorizedOnChannel(token, channel){
     const decoded = decodeToken(token);
     return decoded.channels.contains(channel);
 }
