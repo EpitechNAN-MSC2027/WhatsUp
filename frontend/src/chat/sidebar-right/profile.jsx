@@ -1,9 +1,9 @@
 import React from 'react';
 import './RightSidebar.css';
 
-const ProfileSection = ({ name, avatar }) => (
+const ProfileSection = ({ username, name }) => (
     <div className="profile-section">
-        <h3 className="name">{name}</h3>
+        <h3 className="name">{username}</h3>
     </div>
 );
 
