@@ -1,10 +1,7 @@
 import {Server} from "socket.io";
 import * as auth from"../services/authentication.js"
 import * as commands from "./handleCommands.js";
-import * as userService from "../services/userServices.js";
-import {User} from "../models/user.js";
 import jwt from "jsonwebtoken";
-import {connectChannel, retrieveUser} from "./handleCommands.js";
 
 /**
  * Socket wrong args Response template
@@ -58,7 +55,6 @@ export function createWebsocketServer(server) {
         // Build socket.user
         const payload = auth.decodeToken(socket.token);
         socket.user = await commands.retrieveUser(payload.username);
-        socket.user.channelsAdmin = payload.channelsAdmin;
 
         // Send user channels to client
         socket.emit('channels', socket.user.channels);
@@ -122,7 +118,7 @@ export function createWebsocketServer(server) {
                         }
 
                         channel = args[0];
-                        await commands.deleteChannel(socket, token, channel);
+                        await commands.deleteChannel(socket, channel);
                         break;
 
                     case 'join':

@@ -76,11 +76,11 @@ export function decodeToken(token) {
 
 /**
  * Checks with a token if a user is an admin of a channel
- * @param token the jwt
+ * @param user
  * @param channel the targeted channel
  * @returns {boolean} true if the user is an admin of the channel
  */
-export function isUserAuthorizedOnChannel(token, channel){
-    const decoded = decodeToken(token);
-    return decoded.channels.contains(channel);
+export function isUserAuthorizedOnChannel(user, channel){
+    console.log(user.channelsAdmin);
+    return user.channelsAdmin.includes(channel);
 }

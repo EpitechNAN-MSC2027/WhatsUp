@@ -37,15 +37,45 @@ async function errorResponse(socket, action, message, data) {
     })
 }
 
+/**
+ *
+ * @param socket
+ * @returns {Promise<void>}
+ */
+async function updateUser(socket) {
+    try {
+        socket.user = await retrieveUser(socket.user.username);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+/**
+ * Update the socket user
+ * @param username
+ * @returns {Promise<*>}
+ */
 export async function retrieveUser(username) {
     try {
         let user = await userService.getUser(username);
+        console.log('user:', user);
+        let channelsCreated = await channelService.getChannelsCreated(username);
+        console.log('channelsCreated:', channelsCreated);
 
-        return {
+        let channelsAdmin = [];
+        for (let channel of channelsCreated) {
+            channelsAdmin.push(channel.channelName);
+        }
+
+        let response = {
             username: user['username'],
             nickname: user['nickname'],
             channels: user['channels'],
+            channelsAdmin,
         };
+
+        console.log(response);
+        return response;
     } catch (error) {
         return error;
     }
@@ -63,7 +93,7 @@ export async function defineNickname(socket, nickname) {
     try {
         //const newNickname = await process.updateNickname(nickname);
         await userService.updateNickname(socket.user.username, nickname);
-        socket.user.nickname = nickname;
+        await updateUser(socket);
 
         await successResponse(
             socket,
@@ -119,7 +149,14 @@ export async function createChannel(socket, channel) {
     console.log(`Creating channel: ${channel}`);
 
     try {
+        try {
+            await userService.joinChannel(socket.user.username, channel);
+        } catch (error) {
+            console.log(error);
+        }
+
         const channel_created = await channelService.createChannel(channel, socket.user.username);
+        await updateUser(socket);
 
         await successResponse(
             socket,
@@ -140,15 +177,16 @@ export async function createChannel(socket, channel) {
 /**
  * Delete an existing Channel
  * @param socket
- * @param token
  * @param channel
  * @returns {Promise<void>}
  */
-export async function deleteChannel(socket, token, channel) {
+export async function deleteChannel(socket, channel) {
     console.log(`Deleting channel: ${channel}`);
 
     try {
-        await channelService.deleteChannel(token, channel);
+        await channelService.deleteChannel(socket.user, channel);
+        console.log('Successfully deleting channel');
+        await updateUser(socket);
 
         await successResponse(
             socket,
@@ -168,14 +206,14 @@ export async function deleteChannel(socket, token, channel) {
 
 export async function connectChannel(socket, channel) {
     try {
-        socket.channel = channelService.getChannel(channel);
+        socket.channel = await channelService.getChannel(channel);
         socket.join(socket.channel);
 
         await successResponse(
             socket,
             'connect',
-            'Successfully connect to channel',
-            channel,
+            `Successfully connect to channel: ${socket.channel}`,
+            socket.channel,
         )
     } catch (error) {
         await errorResponse(
@@ -202,15 +240,18 @@ export async function joinChannel(socket, channel) {
         try {
             await channelService.addUserToChannel(channel, socket.user.username);
             await userService.joinChannel(socket.user.username, channel);
-        } catch(_) {}
+            await updateUser(socket);
+        } catch(error) {
+            console.log(error);
+        }
 
-        await connectChannel(socket, channel)
+        await connectChannel(socket, channel);
 
         await successResponse(
             socket,
             'join',
-            `Successfully joined channel ${socket.channel}`,
-            socket.channel,
+            `Successfully joined channel ${channel}`,
+            channel,
         )
 
     } catch (error) {
@@ -236,13 +277,18 @@ export async function quitChannel(socket, channel) {
 
     try {
         if (channelService.getChannel(channel)) {
-            socket.channel = null;
-            socket.leave(channel);
+            if (socket.channel === channel) {
+                socket.leave(channel);
+                await connectChannel(socket, 'general');
+            }
+
+            await userService.leaveChannel(socket.user.username, channel);
+            await updateUser(socket);
 
             await successResponse(
                 socket,
                 'quit',
-                'Successfully quit channel',
+                `Successfully quit channel: ${channel}`,
                 channel,
             )
         }
@@ -329,7 +375,10 @@ export async function messageUser(io, socket, user, message) {
  * @returns {Promise<void>}
  */
 export async function sendMessage(io, socket, message) {
-    console.log('message', message);
+    console.log('message:', message);
+    console.log('socket', socket);
+    console.log('socket.user:', socket.user);
+    console.log('socket.user.nickname:', socket.user.nickname);
 
     try {
         if (socket.channel) {
