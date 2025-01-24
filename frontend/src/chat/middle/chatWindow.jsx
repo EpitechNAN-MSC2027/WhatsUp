@@ -27,62 +27,43 @@ const ChatWindow = () => {
         });
         setSocket(newSocket);
 
-        newSocket.on('connect', () => {
-            console.log('Connected to server:', newSocket.id);
-        });
-
-        // Écoute des messages du canal
+        // Écoute des messages du serveur
         newSocket.on('message', (messageData) => {
-            console.log('Message received:', messageData);
-            if (messageData.channel === currentChannel) {
+            console.log('Message reçu:', messageData);
+            if (messageData.message && messageData.sender) {
                 setMessages(prevMessages => [...prevMessages, {
                     text: messageData.message,
                     sender: messageData.sender,
+                    channel: messageData.channel,
                     type: 'received'
                 }]);
             }
         });
 
-        newSocket.on('channelMessage', (messageData) => {
-            console.log('Channel message received:', messageData);
-            if (messageData.channel === currentChannel) {
-                setMessages(prevMessages => [...prevMessages, {
-                    text: messageData.message,
-                    sender: messageData.sender,
-                    type: 'received'
-                }]);
-            }
-        });
-
+        // Écoute des réponses pour les commandes
         newSocket.on('response', (response) => {
             console.log('Response from server:', response);
-            const { output, data } = handleCommand(response);
             
-            if (response.action === 'list' && response.status === 'success') {
+            if (response.action === 'join' && response.status === 'success') {
+                setCurrentChannel(response.data);
+                setMessages([]); // Réinitialiser les messages lors du changement de canal
+            } else if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
                 setMessages(prev => [...prev, {
-                    text: output,
+                    text: 'Channels disponibles :',
                     type: 'system',
-                    action: 'list',
                     channels: response.data
                 }]);
             } else {
                 setMessages(prev => [...prev, {
-                    text: output,
+                    text: response.message,
                     type: 'system'
                 }]);
             }
-
-            if (response.action === 'join' && response.status === 'success') {
-                setCurrentChannel(response.data.name || response.data);
-                setMessages([]); // Réinitialiser les messages lors du changement de canal
-            }
         });
 
-        return () => {
-            newSocket.disconnect();
-        };
-    }, [currentChannel]);
+        return () => newSocket.disconnect();
+    }, []);
 
     //Fonction pour gérer le défilement
     const scrollToBottom = () => {
@@ -99,27 +80,13 @@ const ChatWindow = () => {
     const handleSendMessage = () => {
         if (!input.trim() || !socket) return;
 
-        if (input.startsWith('/')) {
-            socket.emit('input', {
-                data: input,
-                timestamp: new Date().toISOString(),
-            });
-        } else if (currentChannel) {
-            // Envoi du message dans le canal
-            socket.emit('message', {
-                message: input,
-                channel: currentChannel,
-                timestamp: new Date().toISOString()
-            });
+        // Envoyer le message au serveur
+        socket.emit('input', {
+            data: input,
+            timestamp: new Date().toISOString()
+        });
 
-            // Affichage local du message envoyé
-            setMessages(prev => [...prev, {
-                text: input,
-                sender: 'Vous',
-                type: 'sent'
-            }]);
-        }
-
+        // Ne pas afficher localement le message, attendre la confirmation du serveur
         setInput('');
         setCommandSuggestions([]);
     };
@@ -162,15 +129,14 @@ const ChatWindow = () => {
     return (
         <div className="chat-window">
             <div className="chat-header">
-                <h2>{currentChannel ? `Canal: ${currentChannel.name || currentChannel}` : 'Chat'} </h2>
+                <h2>{currentChannel ? `Canal: ${currentChannel}` : 'Chat'}</h2>
             </div>
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
-                {messages.map((msg, index) => (
-                    <div key={index} 
-                         className={`message ${msg.type || 'received'}`}>
-                        {msg.action === 'list' ? (
+                {messages && messages.map((msg, index) => (
+                    <div key={index} className={`message ${msg.type || 'received'}`}>
+                        {msg.channels ? (
                             <div className="channel-list-message">
-                                <strong>Channels :</strong>
+                                <strong>{msg.text}</strong>
                                 <ul>
                                     {msg.channels.map((channel, idx) => (
                                         <li key={idx}>{channel}</li>
@@ -183,7 +149,7 @@ const ChatWindow = () => {
                                 <span className="message-text">{msg.text}</span>
                             </>
                         ) : (
-                            msg.text
+                            <span className="message-text">{msg.text}</span>
                         )}
                     </div>
                 ))}
