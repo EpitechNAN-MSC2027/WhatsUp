@@ -42,22 +42,22 @@ export async function getChannel(channelName) {
 
 /**
  * Deletes a Channel and all messages associated with it
- * @param token
+ * @param user
  * @param channelName
  * @throws an error if the channel was not found
  */
-export async function deleteChannel(token, channelName)  {
-    if (isUserAuthorizedOnChannel(token, channelName)) {
-        let channelResponse = await db.collection("channels").deleteOne({name: name});
+export async function deleteChannel(user, channelName)  {
+    if (isUserAuthorizedOnChannel(user, channelName)) {
+        let channelResponse = await db.collection("channels").deleteOne({channelName: channelName});
         if (channelResponse.deletedCount === 0) {
             throw new Error("Channel not found")
         }
-        let deletedMessagesCount =  (await db.collection("messages").deleteMany({channel: name})).deletedCount;
+        let deletedMessagesCount =  (await db.collection("messages").deleteMany({channel: channelName})).deletedCount;
 
         console.log("Channel deleted");
         console.log("Messages deleted : " + deletedMessagesCount);
     } else {
-        return new Error("Unauthorized operation: you are not the admin of the channel.");
+        throw new Error("Unauthorized operation: you are not the admin of the channel.");
     }
 }
 
@@ -147,8 +147,8 @@ export async function getChannelUsers(channelName) {
  * @returns
  */
 export async function getChannelsCreated(username) {
-    let res = await db.collection("channels").find({administrator: username});
-    if( res.length === 0 ) {
+    let res = await db.collection("channels").find({admin: username});
+    if (!res) {
         throw new Error("Channel not found");
     }
     return await res.toArray();

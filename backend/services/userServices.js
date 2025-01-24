@@ -16,22 +16,6 @@ export async function createUser(user) {
  */
 export async function getUser(username) {
     return (await db.collection("users").findOne({username: username}));
-    /*
-    let res = await db.collection("users").findOne({username: username});
-    console.log('res', res);
-
-    if (!res) {
-        throw new Error(`Could not find user with username ${username}`);
-    }
-
-    console.log("username", res.username);
-    return ({
-        username: res.username,
-        password: res.password,
-        nickname: res.nickname,
-        channels: res.channels,
-    });
-     */
 }
 
 /**
