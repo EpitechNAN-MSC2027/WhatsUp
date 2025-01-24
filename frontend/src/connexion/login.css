@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=La+Belle+Aurore&family=Sniglet:wght@400;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
 :root {
     --color-back : #5A97BB;
     --color-light : #ECE9CA;
@@ -6,84 +7,107 @@
     --color-button : #E09182;
     --color-banner : #688C80;
     --color-text : #9A4F42;
-}
-
-html {
-    background-color: var(--color-back);
+  }
+  
+  html, body {
+    margin: 0;
+    height: 100%;
     overflow: hidden;
-}
-
-body {
+  }
+  
+  body {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh;
-}
-
-h1 {
-    font-family: "Sniglet", serif;
-    font-weight: 400;
-    font-style: normal;
-    color:var(--color-text);
-    font-size: 48px;
-    margin-bottom: 5px;
-}
-
-p{
-    font-family: "Sniglet", serif;
-    font-weight: 400;
-    font-size: 18px;
-    color:var(--color-text);
-    text-align: center;
-}
-
-label {
-    font-family: "La Belle Aurore", serif;
-    font-weight: 400;
-    font-style: normal;
-    color:var(--color-text);
-    font-size: 33px;
-    margin: 2px 0;
-}
-
-input {
-    padding: 5px;
-    outline: 0;
-    border-radius: 10px;
-    background-color: var(--color-dark);
-    border:none;
-    height: 35px;
-    font-family: "Sniglet", serif;
-    font-weight: 400;
-    font-size: 18px;
-    color:var(--color-text);
-}
-
-.form_login {
+    font-family: 'Sniglet', sans-serif;
+  }
+ 
+  
+  .background-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+  
+  .form_login {
+    z-index: 1;
     background-color: var(--color-light);
     display: flex;
     flex-direction: column;
-    width: 420px;
-    padding: 20px;
+    width: 410px;
+    padding: 12px;
     border-radius: 15px;
-}
-
-.form_login .message_error{
-    color: var(--color-button);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  h1 {
     font-family: "Sniglet", serif;
     font-weight: 400;
-    margin:0;
-    font-size: 18px;
-    text-align: start;
-}
-
-.button {
+    color: var(--color-text);
+    font-size: 45px;
+    margin-bottom: 10px;
+    margin-top: 13px;
+  }
+  
+  label {
+    font-family: "Playwrite AU SA", serif;
+    font-weight: 400;
+    color: var(--color-text);
+    font-size: 20px;
+    margin: 5px 0;
+  }
+  
+  input {
+    padding: 8px;
+    border-radius: 10px;
+    background-color: var(--color-dark);
+    border: none;
+    font-size: 16px;
+    color: var(--color-text);
+  }
+  
+  .button {
     background-color: var(--color-button);
-    margin-top: 50px;
+    margin-top: 30px;
     height: 40px;
-    font-family: "Sniglet", serif;
-    font-weight: 400;
     font-size: 18px;
-    color:var(--color-text);
-
-}
+    color: var(--color-text);
+    
+  }
+  
+  .link {
+    text-align: center;
+  }
+  
+  .link a {
+    color: var(--color-button);
+    text-decoration: none;
+  }
+  
+  .password-container {
+    position: relative;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--color-text);
+  }
+  
+   
+  .login-container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+  }
