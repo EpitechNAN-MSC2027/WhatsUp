@@ -3,6 +3,8 @@ import SignInForm from './signin';
 import SignUpForm from './signup';
 import Chat from '../chat/app.jsx';
 import './login.css'
+import backgroundVideo from '../assets/background-connexion.mp4';
+
 
 
 const App = () => {
@@ -14,7 +16,12 @@ const App = () => {
     const navigateToChat = () => setIsChatVisible(true);
 
     return (
-        <div>
+        <div className="login-container">
+            {!isChatVisible && (
+                <video autoPlay muted loop className="background-video">
+                    <source src={backgroundVideo} type="video/mp4" />
+                </video>
+            )}
             {isChatVisible ? (
                 <Chat />
             ) : isSignIn ? (

@@ -18,8 +18,8 @@ const SignInForm = ({ switchToSignUp, navigateToChat }) => {
             const result = await response.json();
             console.log(result);
 
-            //document.cookie = 'token=' + result.token;
             localStorage.setItem('token', result.token);
+            localStorage.setItem('username', username);
 
             if (result.success) {
                 navigateToChat();

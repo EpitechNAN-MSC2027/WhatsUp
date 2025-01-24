@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import commands from './commands.jsx';
 import EmojiPickerComponent from './emoji.jsx';
+import { handleCommand } from './responseHandler.jsx';
 
 /**
  *
@@ -9,16 +10,16 @@ import EmojiPickerComponent from './emoji.jsx';
  * @returns {Element}
  * @constructor
  */
-const ChatWindow = ({ selectedTeam }) => {
+const ChatWindow = () => {
     const [socket, setSocket] = useState(null);
-    const [messages, setMessages] = useState([]); // Messages reçus du serveur
-    const [input, setInput] = useState(""); // Message à envoyer
-    const [commandSuggestions, setCommandSuggestions] = useState([]); // Suggestions de commandes
-    const [channels, setChannels] = useState([]); // Liste des canaux
-    const messagesEndRef = useRef(null); // Référence pour le conteneur des messages
+    const [messages, setMessages] = useState([]);
+    const [input, setInput] = useState("");
+    const [commandSuggestions, setCommandSuggestions] = useState([]);
+    const [currentChannel, setCurrentChannel] = useState(null);
+    const [channels, setChannels] = useState([]);
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        if (!selectedTeam) return;
         const newSocket = io('http://localhost:3000', {
             auth: {
                 token: localStorage.getItem('token'),
@@ -30,20 +31,60 @@ const ChatWindow = ({ selectedTeam }) => {
             console.log('Connected to server:', newSocket.id);
         });
 
+        // Écoute des messages du canal
+        newSocket.on('message', (messageData) => {
+            console.log('Message received:', messageData);
+            if (messageData.channel === currentChannel) {
+                setMessages(prevMessages => [...prevMessages, {
+                    text: messageData.message,
+                    sender: messageData.sender,
+                    type: 'received'
+                }]);
+            }
+        });
+
+        newSocket.on('channelMessage', (messageData) => {
+            console.log('Channel message received:', messageData);
+            if (messageData.channel === currentChannel) {
+                setMessages(prevMessages => [...prevMessages, {
+                    text: messageData.message,
+                    sender: messageData.sender,
+                    type: 'received'
+                }]);
+            }
+        });
+
         newSocket.on('response', (response) => {
             console.log('Response from server:', response);
-            if (response.action === 'list') {
-                setChannels(response.data); // Mise à jour des canaux
+            const { output, data } = handleCommand(response);
+            
+            if (response.action === 'list' && response.status === 'success') {
+                setChannels(response.data);
+                setMessages(prev => [...prev, {
+                    text: output,
+                    type: 'system',
+                    action: 'list',
+                    channels: response.data
+                }]);
+            } else {
+                setMessages(prev => [...prev, {
+                    text: output,
+                    type: 'system'
+                }]);
             }
-            setMessages((prevMessages) => [...prevMessages, response]);
+
+            if (response.action === 'join' && response.status === 'success') {
+                setCurrentChannel(response.data.name || response.data);
+                setMessages([]); // Réinitialiser les messages lors du changement de canal
+            }
         });
 
         return () => {
             newSocket.disconnect();
         };
-    }, [selectedTeam]);
+    }, [currentChannel]);
 
-        //Fonction pour gérer le défilement
+    //Fonction pour gérer le défilement
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -56,13 +97,31 @@ const ChatWindow = ({ selectedTeam }) => {
     }, [messages]);
 
     const handleSendMessage = () => {
-        if (input.trim() && socket) {
-            const newMessage = { text: input, action: 'sent' }; // Crée un message avec le texte et une action
-            setMessages((prevMessages) => [...prevMessages, newMessage]); // Ajoute localement le message
-            socket.emit('input', { data: input }); // Envoie le message au serveur
-            setInput(''); // Réinitialiser l'entrée
-            setCommandSuggestions([]); // Réinitialiser les suggestions de commandes
+        if (!input.trim() || !socket) return;
+
+        if (input.startsWith('/')) {
+            socket.emit('input', {
+                data: input,
+                timestamp: new Date().toISOString(),
+            });
+        } else if (currentChannel) {
+            // Envoi du message dans le canal
+            socket.emit('message', {
+                message: input,
+                channel: currentChannel,
+                timestamp: new Date().toISOString()
+            });
+
+            // Affichage local du message envoyé
+            setMessages(prev => [...prev, {
+                text: input,
+                sender: 'Vous',
+                type: 'sent'
+            }]);
         }
+
+        setInput('');
+        setCommandSuggestions([]);
     };
 
 
@@ -102,60 +161,62 @@ const ChatWindow = ({ selectedTeam }) => {
 
     return (
         <div className="chat-window">
-            {selectedTeam ? (
-                <>
-                    <h2>{selectedTeam.name} - Chat</h2>
-                    <div className="messages" style={{overflowY: 'auto' }}>
-                        {messages.map((msg, index) => (
-                            <div key={index} className="message">
-                                {/* Affichez les messages ou réponses */}
-                                {msg.action === 'list' ? (
-                                    <div>
-                                        <strong>Channels:</strong>
-                                        <ul>
-                                            {channels.map((channel, idx) => (
-                                                <li key={idx}>{channel}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ) : (
-                                    msg.text ? msg.text : msg.message || 'Message inconnu'
-                                )}
-                            </div>
-                        ))}
-                        {/* Élément caché pour ancrer le défilement */}
-                        <div ref={messagesEndRef} />
-                    </div>
-                    <div className="message-input">
-                        <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
-                        <input
-                            type="text"
-                            placeholder="Type a message, e.g., /list or Hello!"
-                            value={input}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown} // Ajout de l'écouteur pour la touche Entrée
-                        />
-                        <button onClick={handleSendMessage}>Send</button>
-                        {commandSuggestions.length > 0 && (
-                            <div className="command-suggestions">
+            <div className="chat-header">
+                <h2>{currentChannel ? `Canal: ${currentChannel.name || currentChannel}` : 'Chat'} </h2>
+            </div>
+            <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
+                {messages.map((msg, index) => (
+                    <div key={index} 
+                         className={`message ${msg.type || 'received'}`}>
+                        {msg.action === 'list' ? (
+                            <div className="channel-list-message">
+                                <strong>Channels :</strong>
                                 <ul>
-                                    {commandSuggestions.map((command, index) => (
-                                        <li
-                                            key={index}
-                                            onClick={() => handleSuggestionClick(command)}
-                                            style={{ cursor: 'pointer' }}
-                                        >
-                                            {command} - {commands[command]}
-                                        </li>
+                                    {msg.channels.map((channel, idx) => (
+                                        <li key={idx}>{channel}</li>
                                     ))}
                                 </ul>
                             </div>
+                        ) : msg.sender ? (
+                            <>
+                                <span className="message-sender">{msg.sender}: </span>
+                                <span className="message-text">{msg.text}</span>
+                            </>
+                        ) : (
+                            msg.text
                         )}
                     </div>
-                </>
-            ) : (
-                <p>Please select a team to view and send messages.</p>
-            )}
+                ))}
+                <div ref={messagesEndRef} />
+            </div>
+            <div className="message-input">
+                <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
+                <input
+                    type="text"
+                    placeholder={currentChannel 
+                        ? "Type a message, e.g., /list or Hello!" 
+                        : "Use /list to view available channels or /join <channel> to join a channel"}
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                />
+                <button onClick={handleSendMessage}>Send</button>
+                {commandSuggestions.length > 0 && (
+                    <div className="command-suggestions">
+                        <ul>
+                            {commandSuggestions.map((command, index) => (
+                                <li
+                                    key={index}
+                                    onClick={() => handleSuggestionClick(command)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    {command} - {commands[command]}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
