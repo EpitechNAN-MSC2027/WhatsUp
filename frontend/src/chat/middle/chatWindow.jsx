@@ -50,7 +50,7 @@ const ChatWindow = () => {
             } else if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
                 setMessages(prev => [...prev, {
-                    text: 'Channels disponibles :',
+                    text: 'Channels :',
                     type: 'system',
                     channels: response.data
                 }]);
@@ -129,7 +129,7 @@ const ChatWindow = () => {
     return (
         <div className="chat-window">
             <div className="chat-header">
-                <h2>{currentChannel ? `Canal: ${currentChannel}` : 'Chat'}</h2>
+                <h2>{currentChannel ? `${currentChannel}` : 'Chat'}</h2>
             </div>
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages && messages.map((msg, index) => (
