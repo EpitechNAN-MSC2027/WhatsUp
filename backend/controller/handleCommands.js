@@ -297,7 +297,7 @@ export async function quitChannel(socket, channel) {
 
     try {
         if (channelService.getChannel(channel)) {
-            if (socket.channel === channel) {
+            if (socket.channel.channelName === channel) {
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
             }
@@ -335,7 +335,7 @@ export async function listUsers(socket) {
     console.log('Listing users');
 
     try {
-        const users = await channelService.getChannelUsers(socket.channel);
+        const users = await channelService.getChannelUsers(socket.channel.channelName);
 
         await successResponse(
             socket,
@@ -403,15 +403,15 @@ export async function sendMessage(io, socket, message) {
     console.log('socket.user.nickname:', socket.user.nickname);
 
     try {
-        if (socket.channel) {
-            io.to(socket.channel).emit('message',
+        if (socket.channel.channelName) {
+            io.to(socket.channel.channelName).emit('message',
                 `${socket.user.nickname}: ${message}`,
             );
 
             await successResponse(
                 socket,
                 'message',
-                `Message sent successfully in ${socket.channel}`,
+                `Message sent successfully in ${socket.channel.channelName}`,
                 null,
             )
         } else {

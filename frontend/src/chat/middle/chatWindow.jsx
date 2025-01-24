@@ -40,6 +40,11 @@ const ChatWindow = () => {
         // Écoute des messages du serveur
         newSocket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);
+
+            setMessages(prevMessages => [...prevMessages, {
+                text: messageData,
+            }]);
+            /*
             if (messageData.message && messageData.sender) {
                 setMessages(prevMessages => [...prevMessages, {
                     text: messageData.message,
@@ -48,6 +53,7 @@ const ChatWindow = () => {
                     type: 'received'
                 }]);
             }
+             */
         });
 
         // Écoute des réponses pour les commandes
@@ -64,12 +70,16 @@ const ChatWindow = () => {
                     type: 'system',
                     channels: response.data
                 }]);
-            } else {
+            }
+            /*
+            else {
                 setMessages(prev => [...prev, {
                     text: response.message,
                     type: 'system'
                 }]);
             }
+
+             */
         });
 
         return () => newSocket.disconnect();
