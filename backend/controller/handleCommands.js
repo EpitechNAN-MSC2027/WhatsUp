@@ -1,8 +1,5 @@
 import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
-import {getChannelsCreated} from "../services/channelServices.js";
-import {response} from "express";
-import {leaveChannel} from "../services/userServices.js";
 
 /**
  * Socket success Response template
@@ -47,7 +44,7 @@ async function errorResponse(socket, action, message, data) {
  */
 async function updateUser(socket) {
     try {
-        socket.user = retrieveUser(socket.user.username);
+        socket.user = await retrieveUser(socket.user.username);
     } catch (error) {
         console.log(error);
     }
@@ -378,7 +375,10 @@ export async function messageUser(io, socket, user, message) {
  * @returns {Promise<void>}
  */
 export async function sendMessage(io, socket, message) {
-    console.log('message', message);
+    console.log('message:', message);
+    console.log('socket', socket);
+    console.log('socket.user:', socket.user);
+    console.log('socket.user.nickname:', socket.user.nickname);
 
     try {
         if (socket.channel) {
