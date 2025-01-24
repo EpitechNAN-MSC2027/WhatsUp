@@ -14,7 +14,16 @@ const RightSidebar = ({ profile, members }) => {
                 name={profile?.name}
             />
             <img src={avatarGif} alt="Divider GIF" className="avatar"/>
-            <MembersSection members={members}/>
+            <div className="members-section">
+                <h4>Membres</h4>
+                <ul>
+                    {members.map((member, index) => (
+                        <li key={index} className="member-item">
+                            <span>{member.name}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };

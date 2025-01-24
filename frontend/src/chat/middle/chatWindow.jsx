@@ -31,13 +31,24 @@ const ChatWindow = () => {
             console.log('Connected to server:', newSocket.id);
         });
 
-        newSocket.on('channelMessage', (messageData) => {
+        // Écoute des messages du canal
+        newSocket.on('message', (messageData) => {
+            console.log('Message received:', messageData);
             if (messageData.channel === currentChannel) {
-                setMessages((prevMessages) => [...prevMessages, {
+                setMessages(prevMessages => [...prevMessages, {
                     text: messageData.message,
                     sender: messageData.sender,
-                    channel: messageData.channel,
-                    date: messageData.date,
+                    type: 'received'
+                }]);
+            }
+        });
+
+        newSocket.on('channelMessage', (messageData) => {
+            console.log('Channel message received:', messageData);
+            if (messageData.channel === currentChannel) {
+                setMessages(prevMessages => [...prevMessages, {
+                    text: messageData.message,
+                    sender: messageData.sender,
                     type: 'received'
                 }]);
             }
@@ -63,8 +74,8 @@ const ChatWindow = () => {
             }
 
             if (response.action === 'join' && response.status === 'success') {
-                setCurrentChannel(response.data);
-                setMessages([]);
+                setCurrentChannel(response.data.name || response.data);
+                setMessages([]); // Réinitialiser les messages lors du changement de canal
             }
         });
 
@@ -94,15 +105,17 @@ const ChatWindow = () => {
                 timestamp: new Date().toISOString(),
             });
         } else if (currentChannel) {
-            const messageData = {
+            // Envoi du message dans le canal
+            socket.emit('message', {
                 message: input,
                 channel: currentChannel,
-                date: new Date().toISOString()
-            };
-            socket.emit('channelMessage', messageData);
+                timestamp: new Date().toISOString()
+            });
+
+            // Affichage local du message envoyé
             setMessages(prev => [...prev, {
                 text: input,
-                sender: 'You',
+                sender: 'Vous',
                 type: 'sent'
             }]);
         }
@@ -148,7 +161,7 @@ const ChatWindow = () => {
     return (
         <div className="chat-window">
             <div className="chat-header">
-                {currentChannel ? `Canal: ${currentChannel}` : 'Chat'}
+                <h2>{currentChannel ? `Canal: ${currentChannel.name || currentChannel}` : 'Chat'} </h2>
             </div>
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages.map((msg, index) => (
@@ -156,7 +169,7 @@ const ChatWindow = () => {
                          className={`message ${msg.type || 'received'}`}>
                         {msg.action === 'list' ? (
                             <div className="channel-list-message">
-                                <strong>Channels disponibles:</strong>
+                                <strong>Channels :</strong>
                                 <ul>
                                     {msg.channels.map((channel, idx) => (
                                         <li key={idx}>{channel}</li>
