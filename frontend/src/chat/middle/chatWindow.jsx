@@ -16,6 +16,7 @@ const ChatWindow = () => {
     const [input, setInput] = useState("");
     const [commandSuggestions, setCommandSuggestions] = useState([]);
     const [currentChannel, setCurrentChannel] = useState(null);
+    const [channels, setChannels] = useState([]);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -46,16 +47,24 @@ const ChatWindow = () => {
             console.log('Response from server:', response);
             const { output, data } = handleCommand(response);
             
-            // Ajouter le message de réponse
-            setMessages(prev => [...prev, {
-                text: output,
-                type: 'system'
-            }]);
+            if (response.action === 'list' && response.status === 'success') {
+                setChannels(response.data);
+                setMessages(prev => [...prev, {
+                    text: output,
+                    type: 'system',
+                    action: 'list',
+                    channels: response.data
+                }]);
+            } else {
+                setMessages(prev => [...prev, {
+                    text: output,
+                    type: 'system'
+                }]);
+            }
 
-            // Gérer les actions spécifiques
             if (response.action === 'join' && response.status === 'success') {
                 setCurrentChannel(response.data);
-                setMessages([]); // Réinitialiser les messages lors du changement de canal
+                setMessages([]);
             }
         });
 
@@ -145,7 +154,16 @@ const ChatWindow = () => {
                 {messages.map((msg, index) => (
                     <div key={index} 
                          className={`message ${msg.type || 'received'}`}>
-                        {msg.sender ? (
+                        {msg.action === 'list' ? (
+                            <div className="channel-list-message">
+                                <strong>Channels disponibles:</strong>
+                                <ul>
+                                    {msg.channels.map((channel, idx) => (
+                                        <li key={idx}>{channel}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ) : msg.sender ? (
                             <>
                                 <span className="message-sender">{msg.sender}: </span>
                                 <span className="message-text">{msg.text}</span>
