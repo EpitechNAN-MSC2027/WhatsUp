@@ -124,6 +124,7 @@ const ChatWindow = () => {
         setCommandSuggestions([]);
     };
 
+
     const handleInputChange = (e) => {
         const userInput = e.target.value;
         setInput(userInput);
