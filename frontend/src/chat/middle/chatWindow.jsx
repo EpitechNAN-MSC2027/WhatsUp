@@ -27,6 +27,16 @@ const ChatWindow = () => {
         });
         setSocket(newSocket);
 
+        // Ecoute les channels du user
+        newSocket.on('channels', (channels) => {
+            console.log('Channels:', channels);
+        })
+
+        // Ecoute les users du current channel
+        newSocket.on('users', (users) => {
+            console.log('Users:', users);
+        })
+
         // Écoute des messages du serveur
         newSocket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);

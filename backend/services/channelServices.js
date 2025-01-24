@@ -37,7 +37,7 @@ export async function getChannel(channelName) {
     if (!res) {
         throw new Error("Channel not found");
     }
-    return res.channelName;
+    return res;
 }
 
 /**
