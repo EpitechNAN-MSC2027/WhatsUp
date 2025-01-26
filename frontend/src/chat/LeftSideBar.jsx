@@ -12,9 +12,19 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
         const newSocket = io('http://localhost:3000', {
             auth: {
                 token: localStorage.getItem('token'),
-            }
+            },
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 2000,
         });
+        
         setSocket(newSocket);
+
+        // Demander la liste des channels au démarrage
+        newSocket.emit('input', {
+            data: '/channels',
+            timestamp: new Date().toISOString(),
+        });
 
         newSocket.on('channels', (userChannels) => {
             console.log('Channels reçus dans LeftSideBar:', userChannels);
@@ -22,13 +32,21 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
         });
 
         newSocket.on('response', (response) => {
-            if (response.action === 'join') {
-                onChannelChange(response.data);
-                // Demander la liste des membres
+            console.log('Response received:', response);
+            if (response.action === 'join' && response.status === 'success') {
+                // Mettre à jour la liste des channels
                 newSocket.emit('input', {
-                    data: `/members ${response.data}`,
+                    data: '/channels',
                     timestamp: new Date().toISOString(),
                 });
+                onChannelChange(response.data);
+            } else if (response.action === 'create' && response.status === 'success') {
+                // Mettre à jour la liste des channels
+                newSocket.emit('input', {
+                    data: '/channels',
+                    timestamp: new Date().toISOString(),
+                });
+                onChannelChange(response.data);
             } else if (response.action === 'quit') {
                 setJoinedChannels(prev => prev.filter(channel => channel !== response.data));
             } else if (response.action === 'members') {
@@ -37,7 +55,9 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
             }
         });
 
-        return () => newSocket.disconnect();
+        return () => {
+            if (newSocket) newSocket.disconnect();
+        };
     }, [onChannelChange, onMembersChange]);
 
     const handleChannelClick = (channel) => {

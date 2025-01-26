@@ -49,7 +49,7 @@ ul {
 }
 
 .sidebar li {
-    padding: 20px;
+    padding: 13px;
     cursor: pointer;
     border-bottom: 1px solid #ddd;
 }
@@ -159,4 +159,31 @@ ul {
     font-size: 20px;
     font-weight: bold;
     color: #5A97BB;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #2c2c2c;
+    color: white;
+}
+
+.logout-button {
+    padding: 0.5rem 1rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+.main-content {
+    display: flex;
+    height: calc(100vh - 70px); /* Ajustez en fonction de la hauteur du header */
 }
