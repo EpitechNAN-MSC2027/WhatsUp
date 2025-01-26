@@ -16,9 +16,13 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
         });
         setSocket(newSocket);
 
+        newSocket.on('channels', (userChannels) => {
+            console.log('Channels reçus dans LeftSideBar:', userChannels);
+            setJoinedChannels(userChannels);
+        });
+
         newSocket.on('response', (response) => {
             if (response.action === 'join') {
-                setJoinedChannels(prev => [...prev, response.data]);
                 onChannelChange(response.data);
                 // Demander la liste des membres
                 newSocket.emit('input', {
@@ -31,12 +35,6 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
                 setChannelMembers(response.data);
                 onMembersChange(response.data);
             }
-        });
-
-        // Demander la liste des canaux rejoints au démarrage
-        newSocket.emit('input', {
-            data: '/channels',
-            timestamp: new Date().toISOString(),
         });
 
         return () => newSocket.disconnect();
