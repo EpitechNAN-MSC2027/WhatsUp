@@ -8,7 +8,7 @@ import {Channel} from "../models/channel.js";
  * @returns {Promise<void>}
  * @throws Error if the channel was not created
  */
-export async function initGeneralChannel(db) {
+export async function initGeneralChannel() {
     let res = await db.collection("channels").findOne({name: "general"});
     if (!res) {
         console.log("Creating general channel");

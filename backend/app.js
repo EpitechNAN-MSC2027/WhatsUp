@@ -13,7 +13,7 @@ const server = createServer(app);
 app.use(cors());
 app.use(json());
 
-await initGeneralChannel(db);
+await initGeneralChannel();
 createWebsocketServer(server);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -56,5 +56,3 @@ app.post("/register", (req, res) => {
         }
     })
 });
-
-export default db;
