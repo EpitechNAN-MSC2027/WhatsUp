@@ -45,6 +45,20 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }]);
         });
 
+        socket.on('userJoined', (username) => {
+            setMessages(prevMessages => [...prevMessages, {
+                text: `${username} joined the channel :)`,
+                type: 'system-notification'
+            }]);
+        });
+
+        socket.on('userLeft', (username) => {
+            setMessages(prevMessages => [...prevMessages, {
+                text: `${username} left the channel :(`,
+                type: 'system-notification'
+            }]);
+        });
+
         socket.on('response', (response) => {
             console.log('Response from server:', response);
             
@@ -65,6 +79,8 @@ const ChatWindow = ({ currentChannel, socket }) => {
             socket.off('response');
             socket.off('history');
             socket.off('channel');
+            socket.off('userJoined');
+            socket.off('userLeft');
         };
     }, [socket]);
 
@@ -145,6 +161,10 @@ const ChatWindow = ({ currentChannel, socket }) => {
                                         <li key={idx}>{channel}</li>
                                     ))}
                                 </ul>
+                            </div>
+                        ) : msg.type === 'system-notification' ? (
+                            <div className="system-notification">
+                                {msg.text}
                             </div>
                         ) : msg.sender ? (
                             <>
