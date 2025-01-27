@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import {getUser} from "./userServices.js";
-import db from "../app.js";
+import db from "../db/connection.js";
 import crypto from "crypto";
 import {User} from "../models/user.js";
 
