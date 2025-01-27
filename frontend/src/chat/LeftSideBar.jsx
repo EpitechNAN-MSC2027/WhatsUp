@@ -15,6 +15,17 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
             setJoinedChannels(userChannels);
         });
 
+        socket.on('channel', (channel) => {
+            console.log('Current channel:', channel);
+            onChannelChange(channel);
+        });
+
+        socket.on('users', (members) => {
+            console.log('Current members:', members);
+            onMembersChange(members);
+        })
+
+        /*
         // Écoute des réponses
         socket.on('response', async (response) => {
             console.log('Response received in LeftSideBar:', response);
@@ -40,6 +51,8 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
                 onMembersChange(response.data);
             }
         });
+
+         */
 
         /*
         // Demande initiale des channels

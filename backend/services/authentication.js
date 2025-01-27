@@ -3,6 +3,7 @@ import {getUser} from "./userServices.js";
 import db from "../db/connection.js";
 import crypto from "crypto";
 import {User} from "../models/user.js";
+import * as channelService from "./channelServices.js";
 
 
 const secretKey = process.env.JWT_SECRET || "secret";
@@ -55,12 +56,13 @@ export async function checkUserCredentials(username, password) {
  * @returns {Promise<boolean>} returns the promise of a boolean
  */
 export async function registerUser(username, password, nickname) {
-    const user = new User(username, hashPassword(password), nickname, []);
+    const user = new User(username, hashPassword(password), nickname, ['general']);
     let result = await db.collection("users").findOne({username: username});
     if (result !== null){
         console.log("User already exists");
         return false;
     }
+    await channelService.addUserToChannel('general', username);
     let insertResponse = await db.collection("users").insertOne(user.toConst());
     return insertResponse.acknowledged;
 }
