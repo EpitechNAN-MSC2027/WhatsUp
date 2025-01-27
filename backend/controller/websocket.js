@@ -58,7 +58,7 @@ export function createWebsocketServer(server) {
 
         // Send user channels to client
         socket.emit('channels', socket.user.channels);
-        socket.join("general");
+        await commands.connectChannel(socket, "general");
 
         console.log(socket.user);
 

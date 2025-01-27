@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './RightSidebar.css';
 import ProfileSection from './profile';
 import MembersSection from './members';
@@ -6,6 +6,8 @@ import avatarGif from './avatar.gif';
 
 const RightSidebar = ({ profile, members }) => {
     const username = localStorage.getItem('username');
+
+    console.log('members:', members);
     
     return (
         <div className="right-sidebar">
@@ -19,7 +21,7 @@ const RightSidebar = ({ profile, members }) => {
                 <ul>
                     {members.map((member, index) => (
                         <li key={index} className="member-item">
-                            <span>{member.name}</span>
+                            <span>{member}</span>
                         </li>
                     ))}
                 </ul>

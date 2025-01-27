@@ -162,22 +162,15 @@ export async function createChannel(socket, channel) {
     console.log(`Creating channel: ${channel}`);
 
     try {
-        try {
-            console.log('before joining');
-            await userService.joinChannel(socket.user.username, channel);
-            console.log('after joining');
-        } catch (error) {
-            console.log(error);
-        }
-
-        console.log('before creating');
         const channel_created = await channelService.createChannel(channel, socket.user.username);
-        console.log('after creating');
+        await userService.joinChannel(socket.user.username, channel);
 
         console.log('channel created:', channel_created);
 
         await updateUser(socket);
         await sendChannels(socket, socket.user.channels);
+
+        await connectChannel(socket, channel);
 
         await successResponse(
             socket,
@@ -233,6 +226,7 @@ export async function connectChannel(socket, channel) {
         console.log('Connected channel:', socket.channel);
         socket.join(socket.channel.name);
 
+        socket.emit('channel', socket.channel.name);
         socket.emit('users', socket.channel.users);
 
         let messages = await messageService.getAllMessagesFromChannel(socket.channel.name);
@@ -252,7 +246,6 @@ export async function connectChannel(socket, channel) {
  */
 export async function joinChannel(socket, channel) {
     console.log(`Joining channel: ${channel}`);
-
 
     try {
         // To modify
@@ -295,6 +288,8 @@ export async function joinChannel(socket, channel) {
  */
 export async function quitChannel(socket, channel) {
     console.log(`Quitting channel: ${channel}`);
+
+    console.log("socket.channel: ", socket.channel);
 
     try {
         if (channelService.getChannel(channel)) {

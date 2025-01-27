@@ -20,6 +20,13 @@ const ChatWindow = ({ currentChannel, socket }) => {
     useEffect(() => {
         if (!socket) return;
 
+        /*
+        socket.on('channel', (channel) => {
+            console.log('Current channel:', channel);
+            currentChannel = channel;
+        });
+         */
+
         socket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);
             setMessages(prevMessages => [...prevMessages, {
@@ -112,7 +119,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
     return (
         <div className="chat-window">
             <div className="chat-header">
-                <h2>{currentChannel ? `${currentChannel}` : 'Chat'}</h2>
+                <h2>{currentChannel ? `${currentChannel}` : 'general'}</h2>
             </div>
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages && messages.map((msg, index) => (
