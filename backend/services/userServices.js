@@ -1,4 +1,4 @@
-import db from "../app.js";
+import db from "../db/connection.js";
 
 /**
  * Creates a user in the database

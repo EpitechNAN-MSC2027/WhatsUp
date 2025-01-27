@@ -1,4 +1,4 @@
-import db from "../app.js";
+import db from "../db/connection";
 import Message from "../models/message.js";
 
 /**

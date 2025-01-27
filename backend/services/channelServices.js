@@ -1,4 +1,4 @@
-import db from "../app.js";
+import db from "../db/connection.js";
 import {isUserAuthorizedOnChannel} from "./authentication.js";
 import {Channel} from "../models/channel.js";
 
