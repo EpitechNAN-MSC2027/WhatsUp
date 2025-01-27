@@ -27,6 +27,12 @@ const ChatWindow = ({ currentChannel, socket }) => {
         });
          */
 
+        socket.on('history', (history) => {
+            console.log('messages historic:', history);
+            setMessages(history);
+            console.log('messages array:', messages);
+        });
+
         socket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);
             setMessages(prevMessages => [...prevMessages, {
@@ -38,7 +44,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             console.log('Response from server:', response);
             
             if (response.action === 'join' && response.status === 'success') {
-                setMessages([]); // Réinitialiser les messages lors du changement de canal
+                //setMessages([]); // Réinitialiser les messages lors du changement de canal
             } else if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
                 setMessages(prev => [...prev, {
