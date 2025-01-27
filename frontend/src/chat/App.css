@@ -13,34 +13,53 @@ h2 {
     color:#f4c4ba;
 }
 
-.app-container {
+.app-layout {
     display: flex;
+    width: 100vw;
     height: 100vh;
-    margin:0;
-    font-size: 1.2rem;
+    overflow: hidden;
 }
 
-ul {
-    padding-inline-start: 17px;
+.sidebar {
+    width: 14%;
+    min-width: 200px;
+    background-color: #dff2f9;
+    padding: 10px;
+    border: 7px solid #5ab6db;
+    color: #9c6956;
+    font-family: "Josefin Sans", serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.chat-window {
+    width: 73%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    box-sizing: border-box;
 }
 
 .right-sidebar {
-    width: 10%;
+    width: 12.8%;
+    min-width: 150px;
     background-color: #f4c7ba;
     border-left: 1px solid #c26c70;
     display: flex;
     flex-direction: column;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
+    height: 100vh;
+    box-sizing: border-box;
 }
 
-.sidebar {
-    width: 12%;
-    background-color: #dff2f9;
-    padding: 10px;
-    border: 7px solid #5ab6db;
-    color:#9c6956;
-    font-family: "Josefin Sans", serif;
+.channels-container {
+    flex: 1;
+    overflow-y: auto;
 }
 
 .sidebar ul {
@@ -49,21 +68,13 @@ ul {
 }
 
 .sidebar li {
-    padding: 20px;
+    padding: 13px;
     cursor: pointer;
     border-bottom: 1px solid #ddd;
 }
 
 .sidebar li:hover {
     background-color: #fbfefc;
-}
-
-.chat-window {
-    width: 73.2%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
 }
 
 .messages {
@@ -117,7 +128,7 @@ ul {
     background-color: #f4c4ba;
     max-height: 150px;
     overflow-y: auto;
-    width: 75%;
+    width: 70.4%;
     z-index: 1;
     bottom: 70px;
 }
@@ -139,7 +150,7 @@ ul {
 
 
 .emoji-picker-component button {
-    padding: 10px 15px 10px 15px;
+    padding: 10px 18px 10px 15px;
     background-color: transparent;
     color: #ffff;
     border: none;
@@ -159,4 +170,60 @@ ul {
     font-size: 20px;
     font-weight: bold;
     color: #5A97BB;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #2c2c2c;
+    color: white;
+}
+
+.logout-button {
+    margin-top: auto;
+    padding: 10px;
+    background-color: #f4c7ba;
+    color: #c26c70;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.logout-button:hover {
+    background-color: #e6a5ab;
+}
+
+/* Ajuster les styles pour la responsivité */
+@media (max-width: 1200px) {
+    .sidebar {
+        min-width: 150px;
+    }
+    
+    .right-sidebar {
+        min-width: 120px;
+    }
+    
+    .chat-window {
+        width: 70%;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        min-width: 100px;
+    }
+    
+    .right-sidebar {
+        min-width: 100px;
+    }
+    
+    .chat-window {
+        width: 65%;
+        padding: 10px;
+    }
 }
