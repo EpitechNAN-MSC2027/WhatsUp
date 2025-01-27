@@ -2,51 +2,58 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import MembersSection from './sidebar-right/members';
 
-const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
+const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, currentChannel }) => {
     const [joinedChannels, setJoinedChannels] = useState([]);
-    const [socket, setSocket] = useState(null);
-    const [currentChannel, setCurrentChannel] = useState(null);
     const [channelMembers, setChannelMembers] = useState([]);
 
     useEffect(() => {
-        const newSocket = io('http://localhost:3000', {
-            auth: {
-                token: localStorage.getItem('token'),
-            }
-        });
-        setSocket(newSocket);
+        if (!socket) return;
 
-        newSocket.on('response', (response) => {
-            if (response.action === 'join') {
-                setJoinedChannels(prev => [...prev, response.data]);
-                onChannelChange(response.data);
-                // Demander la liste des membres
-                newSocket.emit('input', {
-                    data: `/members ${response.data}`,
-                    timestamp: new Date().toISOString(),
+        // Écoute des channels
+        socket.on('channels', (userChannels) => {
+            console.log('Channels reçus dans LeftSideBar:', userChannels);
+            setJoinedChannels(userChannels);
+        });
+
+        // Écoute des réponses
+        socket.on('response', async (response) => {
+            console.log('Response received in LeftSideBar:', response);
+            if (response.action === 'join' && response.status === 'success') {
+                setJoinedChannels(prev => {
+                    if (!prev.includes(response.data)) {
+                        return [...prev, response.data];
+                    }
+                    return prev;
                 });
-            } else if (response.action === 'quit') {
+                onChannelChange(response.data);
+            } 
+            else if (response.action === 'create' && response.status === 'success') {
+                window.location.reload();
+            } 
+            else if (response.action === 'quit') {
                 setJoinedChannels(prev => prev.filter(channel => channel !== response.data));
-            } else if (response.action === 'members') {
+            } 
+            else if (response.action === 'members') {
                 setChannelMembers(response.data);
                 onMembersChange(response.data);
             }
         });
 
-        // Demander la liste des canaux rejoints au démarrage
-        newSocket.emit('input', {
+        // Demande initiale des channels
+        socket.emit('input', {
             data: '/channels',
             timestamp: new Date().toISOString(),
         });
 
-        return () => newSocket.disconnect();
-    }, [onChannelChange, onMembersChange]);
+        return () => {
+            socket.off('channels');
+            socket.off('response');
+        };
+    }, [socket, onChannelChange, onMembersChange]);
 
     const handleChannelClick = (channel) => {
-        setCurrentChannel(channel);
-        onChannelChange(channel);
         socket.emit('input', {
-            data: `/members ${channel}`,
+            data: `/join ${channel}`,
             timestamp: new Date().toISOString(),
         });
     };
@@ -54,17 +61,22 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
     return (
         <div className="sidebar">
             <h3>My channels</h3>
-            <ul className="channel-list">
-                {joinedChannels.map((channel, index) => (
-                    <li 
-                        key={index} 
-                        className={`channel-item ${channel === currentChannel ? 'active' : ''}`}
-                        onClick={() => handleChannelClick(channel)}
-                    >
-                        # {channel}
-                    </li>
-                ))}
-            </ul>
+            <div className="channels-container">
+                <ul className="channel-list">
+                    {joinedChannels.map((channel, index) => (
+                        <li 
+                            key={index} 
+                            className={`channel-item ${channel === currentChannel ? 'active' : ''}`}
+                            onClick={() => handleChannelClick(channel)}
+                        >
+                            # {channel}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <button onClick={onLogout} className="logout-button">
+                Log out
+            </button>
         </div>
     );
 };

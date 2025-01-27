@@ -1,11 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './connexion/connexion-main.jsx';
-import './style.css'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import ConnexionMain from './connexion/connexion-main.jsx';
+import App from './chat/app.jsx';
+import './style.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<ConnexionMain />} />
+        <Route path="/chat" element={<App />} />
+        <Route path="/" element={<Navigate to="/chat" replace />} />
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
 );
