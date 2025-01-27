@@ -10,59 +10,27 @@ import { handleCommand } from './responseHandler.jsx';
  * @returns {Element}
  * @constructor
  */
-const ChatWindow = () => {
-    const [socket, setSocket] = useState(null);
+const ChatWindow = ({ currentChannel, socket }) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [commandSuggestions, setCommandSuggestions] = useState([]);
-    const [currentChannel, setCurrentChannel] = useState(null);
     const [channels, setChannels] = useState([]);
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
-        const newSocket = io('http://localhost:3000', {
-            auth: {
-                token: localStorage.getItem('token'),
-            }
-        });
-        setSocket(newSocket);
+        if (!socket) return;
 
-        // Mise à jour de la gestion des channels
-        newSocket.on('channels', (userChannels) => {
-            console.log('Channels reçus:', userChannels);
-            setChannels(userChannels);
-        });
-
-        // Ecoute les users du current channel
-        newSocket.on('users', (users) => {
-            console.log('Users:', users);
-        })
-
-        // Écoute des messages du serveur
-        newSocket.on('message', (messageData) => {
+        socket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);
-
             setMessages(prevMessages => [...prevMessages, {
                 text: messageData,
             }]);
-            /*
-            if (messageData.message && messageData.sender) {
-                setMessages(prevMessages => [...prevMessages, {
-                    text: messageData.message,
-                    sender: messageData.sender,
-                    channel: messageData.channel,
-                    type: 'received'
-                }]);
-            }
-             */
         });
 
-        // Écoute des réponses pour les commandes
-        newSocket.on('response', (response) => {
+        socket.on('response', (response) => {
             console.log('Response from server:', response);
             
             if (response.action === 'join' && response.status === 'success') {
-                setCurrentChannel(response.data);
                 setMessages([]); // Réinitialiser les messages lors du changement de canal
             } else if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
@@ -72,19 +40,13 @@ const ChatWindow = () => {
                     channels: response.data
                 }]);
             }
-            /*
-            else {
-                setMessages(prev => [...prev, {
-                    text: response.message,
-                    type: 'system'
-                }]);
-            }
-
-             */
         });
 
-        return () => newSocket.disconnect();
-    }, []);
+        return () => {
+            socket.off('message');
+            socket.off('response');
+        };
+    }, [socket]);
 
     //Fonction pour gérer le défilement
     const scrollToBottom = () => {

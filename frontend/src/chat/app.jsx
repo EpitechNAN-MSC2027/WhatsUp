@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import io from "socket.io-client";
 import LeftSideBar from './LeftSideBar.jsx';
 import ChatWindow from './middle/chatWindow.jsx';
 import RightSidebar from './sidebar-right/RightSidebar';
@@ -9,16 +10,28 @@ const App = () => {
     const [currentChannel, setCurrentChannel] = useState(null);
     const [channelMembers, setChannelMembers] = useState([]);
     const [isConnected, setIsConnected] = useState(false);
+    const [socket, setSocket] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Vérifier si un token existe au chargement
         const token = localStorage.getItem('token');
         if (!token) {
-            // Si pas de token, rediriger vers la page de connexion
             navigate('/login');
         } else {
             setIsConnected(true);
+            const newSocket = io('http://localhost:3000', {
+                auth: {
+                    token: token,
+                },
+                reconnection: true,
+                reconnectionAttempts: 10,
+                reconnectionDelay: 2000,
+            });
+            setSocket(newSocket);
+
+            return () => {
+                if (newSocket) newSocket.disconnect();
+            };
         }
     }, [navigate]);
 
@@ -29,10 +42,8 @@ const App = () => {
         navigate('/login');
     };
 
-    // Si l'utilisateur n'est pas connecté, ne rien afficher pendant la redirection
-    if (!isConnected) {
+    if (!isConnected || !socket) {
         return null;
-        
     }
 
     const profile = {
@@ -46,8 +57,13 @@ const App = () => {
                 onChannelChange={setCurrentChannel} 
                 onMembersChange={setChannelMembers}
                 onLogout={handleLogout}
+                socket={socket}
+                currentChannel={currentChannel}
             />
-            <ChatWindow currentChannel={currentChannel} />
+            <ChatWindow 
+                currentChannel={currentChannel}
+                socket={socket}
+            />
             <RightSidebar 
                 profile={profile} 
                 members={channelMembers} 
