@@ -15,7 +15,7 @@ app.use(cors());
 app.use(json());
 const db = await connectDB();
 
-await initGeneralChannel();
+await initGeneralChannel(db);
 createWebsocketServer(server);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));

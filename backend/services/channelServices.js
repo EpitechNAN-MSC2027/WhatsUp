@@ -8,9 +8,10 @@ import {Channel} from "../models/channel.js";
  * @returns {Promise<void>}
  * @throws Error if the channel was not created
  */
-export async function initGeneralChannel() {
+export async function initGeneralChannel(db) {
     let res = await db.collection("channels").findOne({name: "general"});
     if (!res) {
+        console.log("Creating general channel");
         let channel = new Channel("general", "admin", [], ["admin"]);
         let createResponse = await db.collection("channels").insertOne(channel.toConst());
         if (!createResponse.acknowledged) {
@@ -34,7 +35,7 @@ export async function getChannels(filter) {
             .toArray();
     } else {
         res = await db.collection("channels")
-            .find({}, { projection: { channelName: 1, _id: 0 } })
+            .find({}, { projection: { name: 1, _id: 0 } })
             .toArray();
     }
 
@@ -42,7 +43,7 @@ export async function getChannels(filter) {
         throw new Error("No channels found");
     }
     else {
-        return res.map(channel => channel.channelName);
+        return res.map(channel => channel.name);
     }
 }
 
@@ -51,7 +52,7 @@ export async function getChannels(filter) {
  * @returns {String} the name of the channel
  */
 export async function getChannel(channelName) {
-    let res = await db.collection("channels").findOne({channelName: channelName});
+    let res = await db.collection("channels").findOne({name: channelName});
     if (!res) {
         throw new Error("Channel not found");
     }
@@ -96,6 +97,7 @@ export async function createChannel(channelName, username) {
 
     let channel = new Channel(channelName, username, [], [username]);
 
+    console.log("new Channel Object created:", channel);
 
     let createResponse = await db.collection("channels").insertOne(channel.toConst());
     if (!createResponse.acknowledged) {
