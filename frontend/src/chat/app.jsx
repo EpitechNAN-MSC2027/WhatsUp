@@ -41,24 +41,17 @@ const App = () => {
     };
 
     return (
-        <div className="app-container">
-            <div className="header">
-                <h1>Chat App</h1>
-                <button onClick={handleLogout} className="logout-button">
-                    Déconnexion
-                </button>
-            </div>
-            <div className="main-content">
-                <LeftSideBar 
-                    onChannelChange={setCurrentChannel} 
-                    onMembersChange={setChannelMembers}
-                />
-                <ChatWindow currentChannel={currentChannel} />
-                <RightSidebar 
-                    profile={profile} 
-                    members={channelMembers} 
-                />
-            </div>
+        <div className="app-layout">
+            <LeftSideBar 
+                onChannelChange={setCurrentChannel} 
+                onMembersChange={setChannelMembers}
+                onLogout={handleLogout}
+            />
+            <ChatWindow currentChannel={currentChannel} />
+            <RightSidebar 
+                profile={profile} 
+                members={channelMembers} 
+            />
         </div>
     );
 };

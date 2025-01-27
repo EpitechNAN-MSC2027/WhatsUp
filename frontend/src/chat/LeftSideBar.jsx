@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import MembersSection from './sidebar-right/members';
 
-const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
+const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout }) => {
     const [joinedChannels, setJoinedChannels] = useState([]);
     const [socket, setSocket] = useState(null);
     const [currentChannel, setCurrentChannel] = useState(null);
@@ -72,17 +72,22 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
     return (
         <div className="sidebar">
             <h3>My channels</h3>
-            <ul className="channel-list">
-                {joinedChannels.map((channel, index) => (
-                    <li 
-                        key={index} 
-                        className={`channel-item ${channel === currentChannel ? 'active' : ''}`}
-                        onClick={() => handleChannelClick(channel)}
-                    >
-                        # {channel}
-                    </li>
-                ))}
-            </ul>
+            <div className="channels-container">
+                <ul className="channel-list">
+                    {joinedChannels.map((channel, index) => (
+                        <li 
+                            key={index} 
+                            className={`channel-item ${channel === currentChannel ? 'active' : ''}`}
+                            onClick={() => handleChannelClick(channel)}
+                        >
+                            # {channel}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+            <button onClick={onLogout} className="logout-button">
+                Log out
+            </button>
         </div>
     );
 };

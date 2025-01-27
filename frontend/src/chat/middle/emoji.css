@@ -15,17 +15,6 @@
     overflow: hidden;
 }
 
-.emoji-picker-component button {
-    padding: 10px 35px 10px 8px;
-    background-color: #ECE9CA;
-    color: #ECE9CA;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 0;
-    margin-right: -2px;
-}
-
-
 .message-input input {
     flex: 1;
     margin-left: 30px;
