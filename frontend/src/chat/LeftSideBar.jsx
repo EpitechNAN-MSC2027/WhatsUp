@@ -20,39 +20,54 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout }) => {
         
         setSocket(newSocket);
 
-        // Demander la liste des channels au démarrage
-        newSocket.emit('input', {
-            data: '/channels',
-            timestamp: new Date().toISOString(),
-        });
-
+        // Écoute des channels
         newSocket.on('channels', (userChannels) => {
             console.log('Channels reçus dans LeftSideBar:', userChannels);
             setJoinedChannels(userChannels);
         });
 
-        newSocket.on('response', (response) => {
+        // Écoute des réponses
+        newSocket.on('response', async (response) => {
             console.log('Response received:', response);
             if (response.action === 'join' && response.status === 'success') {
-                // Mettre à jour la liste des channels
+                // Mise à jour locale immédiate
+                setJoinedChannels(prev => {
+                    if (!prev.includes(response.data)) {
+                        return [...prev, response.data];
+                    }
+                    return prev;
+                });
+                onChannelChange(response.data);
+                
+                // Demander une mise à jour des channels
                 newSocket.emit('input', {
                     data: '/channels',
                     timestamp: new Date().toISOString(),
                 });
-                onChannelChange(response.data);
-            } else if (response.action === 'create' && response.status === 'success') {
-                // Mettre à jour la liste des channels
-                newSocket.emit('input', {
-                    data: '/channels',
-                    timestamp: new Date().toISOString(),
-                });
-                onChannelChange(response.data);
-            } else if (response.action === 'quit') {
+            } 
+            else if (response.action === 'create' && response.status === 'success') {
+                // Rafraîchissement automatique de la page
+                window.location.reload();
+            } 
+            else if (response.action === 'quit') {
                 setJoinedChannels(prev => prev.filter(channel => channel !== response.data));
-            } else if (response.action === 'members') {
+                
+                // Demander une mise à jour des channels
+                newSocket.emit('input', {
+                    data: '/channels',
+                    timestamp: new Date().toISOString(),
+                });
+            } 
+            else if (response.action === 'members') {
                 setChannelMembers(response.data);
                 onMembersChange(response.data);
             }
+        });
+
+        // Demande initiale des channels
+        newSocket.emit('input', {
+            data: '/channels',
+            timestamp: new Date().toISOString(),
         });
 
         return () => {
