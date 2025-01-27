@@ -32,6 +32,7 @@ const App = () => {
     // Si l'utilisateur n'est pas connecté, ne rien afficher pendant la redirection
     if (!isConnected) {
         return null;
+        
     }
 
     const profile = {
