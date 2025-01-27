@@ -22,9 +22,9 @@ export async function writeMessage(user, channel, content) {
     let date = new Date();
 
     let message = new Message(
+        content,
         user,
         channel,
-        content,
         date
     );
 
