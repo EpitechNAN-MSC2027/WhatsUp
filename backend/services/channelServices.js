@@ -4,6 +4,23 @@ import {Channel} from "../models/channel.js";
 
 
 /**
+ * Initializes the general channel if it does not exist
+ * @returns {Promise<void>}
+ * @throws Error if the channel was not created
+ */
+export async function initGeneralChannel() {
+    let res = await db.collection("channels").findOne({name: "general"});
+    if (!res) {
+        let channel = new Channel("general", "admin", [], ["admin"]);
+        let createResponse = await db.collection("channels").insertOne(channel.toConst());
+        if (!createResponse.acknowledged) {
+            throw new Error("Channel not created")
+        }
+    }
+}
+
+
+/**
  * Gets all channels with an optional filter on the name that does the LIKE operation
  * @returns {WithId<Document>[]}
  * @throws Error if no channels were found
