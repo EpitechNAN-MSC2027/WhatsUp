@@ -1,5 +1,3 @@
-import db from "../db/connection";
-
 class Message {
 
     constructor(message, sender, channel, date) {

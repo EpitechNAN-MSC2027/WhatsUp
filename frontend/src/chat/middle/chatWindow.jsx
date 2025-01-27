@@ -20,6 +20,19 @@ const ChatWindow = ({ currentChannel, socket }) => {
     useEffect(() => {
         if (!socket) return;
 
+        /*
+        socket.on('channel', (channel) => {
+            console.log('Current channel:', channel);
+            currentChannel = channel;
+        });
+         */
+
+        socket.on('history', (history) => {
+            console.log('messages historic:', history);
+            setMessages(history);
+            console.log('messages array:', messages);
+        });
+
         socket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);
             setMessages(prevMessages => [...prevMessages, {
@@ -31,7 +44,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             console.log('Response from server:', response);
             
             if (response.action === 'join' && response.status === 'success') {
-                setMessages([]); // Réinitialiser les messages lors du changement de canal
+                //setMessages([]); // Réinitialiser les messages lors du changement de canal
             } else if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
                 setMessages(prev => [...prev, {
@@ -112,7 +125,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
     return (
         <div className="chat-window">
             <div className="chat-header">
-                <h2>{currentChannel ? `${currentChannel}` : 'Chat'}</h2>
+                <h2>{currentChannel ? `${currentChannel}` : 'general'}</h2>
             </div>
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages && messages.map((msg, index) => (

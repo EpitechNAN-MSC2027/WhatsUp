@@ -1,4 +1,4 @@
-import db from "../app.js";
+import db from "../db/connection.js";
 import Message from "../models/message.js";
 
 /**
@@ -22,9 +22,9 @@ export async function writeMessage(user, channel, content) {
     let date = new Date();
 
     let message = new Message(
+        content,
         user,
         channel,
-        content,
         date
     );
 

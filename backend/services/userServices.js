@@ -1,4 +1,4 @@
-import db from "../app.js";
+import db from "../db/connection.js";
 
 /**
  * Creates a user in the database
@@ -56,11 +56,10 @@ export async function joinChannel(username, channel) {
  * @returns {UpdateResult<Document>}
  */
 export async function leaveChannel(username, channel) {
-    let res =  await db.collection("users").updateOne({username: username}, {$pull: {channels: channel}});
+    let res = await db.collection("users").updateOne({username: username}, {$pull: {channels: channel}});
     if (res.modifiedCount === 0) {
         throw new Error("Channel not removed from user");
-    }
-    else{
+    } else {
         return res.modifiedCount;
     }
 }
@@ -71,10 +70,6 @@ export async function leaveChannel(username, channel) {
  * @returns {Promise<Document & {_id: InferIdType<Document>}>}
  */
 export async function getAllChannelsFromUser(username) {
-    let res =  await db.collection("users").findOne({username: username}, {projection: {channels: 1, _id: 0}});
+    let res = await db.collection("users").findOne({username: username}, {projection: {channels: 1, _id: 0}});
     return res.channels;
 }
-
-
-// Need a function to get all users that have joined a specific channel,
-// to list the users in the current channel

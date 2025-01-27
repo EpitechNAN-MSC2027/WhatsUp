@@ -3,17 +3,17 @@ import { createServer } from 'node:http';
 import { createWebsocketServer } from './controller/websocket.js';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { connectDB } from "./db/connection.js";
 import {checkUserCredentials, createToken, hashPassword, registerUser} from "./services/authentication.js";
 import {getUser} from "./services/userServices.js";
-import {getChannelsCreated} from "./services/channelServices.js";
+import {getChannelsCreated, initGeneralChannel} from "./services/channelServices.js";
 import cors from 'cors';
 
 const app = express();
 const server = createServer(app);
 app.use(cors());
 app.use(json());
-const db = await connectDB();
+
+await initGeneralChannel();
 createWebsocketServer(server);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -56,5 +56,3 @@ app.post("/register", (req, res) => {
         }
     })
 });
-
-export default db;

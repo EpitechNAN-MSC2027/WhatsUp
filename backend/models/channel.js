@@ -1,5 +1,3 @@
-import db from "../db/connection";
-
 export class Channel {
     constructor(name, administrator, messages, users) {
         this.name = name;

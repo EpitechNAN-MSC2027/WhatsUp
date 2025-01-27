@@ -1,5 +1,24 @@
-import db from "../app.js";
+import db from "../db/connection.js";
 import {isUserAuthorizedOnChannel} from "./authentication.js";
+import {Channel} from "../models/channel.js";
+
+
+/**
+ * Initializes the general channel if it does not exist
+ * @returns {Promise<void>}
+ * @throws Error if the channel was not created
+ */
+export async function initGeneralChannel() {
+    let res = await db.collection("channels").findOne({name: "general"});
+    if (!res) {
+        console.log("Creating general channel");
+        let channel = new Channel("general", "admin", [], ["admin"]);
+        let createResponse = await db.collection("channels").insertOne(channel.toConst());
+        if (!createResponse.acknowledged) {
+            throw new Error("Channel not created")
+        }
+    }
+}
 
 
 /**
@@ -16,7 +35,7 @@ export async function getChannels(filter) {
             .toArray();
     } else {
         res = await db.collection("channels")
-            .find({}, { projection: { channelName: 1, _id: 0 } })
+            .find({}, { projection: { name: 1, _id: 0 } })
             .toArray();
     }
 
@@ -24,7 +43,7 @@ export async function getChannels(filter) {
         throw new Error("No channels found");
     }
     else {
-        return res.map(channel => channel.channelName);
+        return res.map(channel => channel.name);
     }
 }
 
@@ -33,7 +52,7 @@ export async function getChannels(filter) {
  * @returns {String} the name of the channel
  */
 export async function getChannel(channelName) {
-    let res = await db.collection("channels").findOne({channelName: channelName});
+    let res = await db.collection("channels").findOne({name: channelName});
     if (!res) {
         throw new Error("Channel not found");
     }
@@ -48,11 +67,11 @@ export async function getChannel(channelName) {
  */
 export async function deleteChannel(user, channelName)  {
     if (isUserAuthorizedOnChannel(user, channelName)) {
-        let channelResponse = await db.collection("channels").deleteOne({channelName: channelName});
+        let channelResponse = await db.collection("channels").deleteOne({name: channelName});
         if (channelResponse.deletedCount === 0) {
             throw new Error("Channel not found")
         }
-        let deletedMessagesCount =  (await db.collection("messages").deleteMany({channel: channelName})).deletedCount;
+        let deletedMessagesCount =  (await db.collection("messages").deleteMany({name: channelName})).deletedCount;
 
         console.log("Channel deleted");
         console.log("Messages deleted : " + deletedMessagesCount);
@@ -76,14 +95,11 @@ export async function createChannel(channelName, username) {
         throw new Error("Channel already exists");
     }
 
-    // create the channel
-    let channel = {
-        channelName : channelName,
-        admin : username,
-        users : [username]
-    }
+    let channel = new Channel(channelName, username, [], [username]);
 
-    let createResponse = await db.collection("channels").insertOne(channel);
+    console.log("new Channel Object created:", channel);
+
+    let createResponse = await db.collection("channels").insertOne(channel.toConst());
     if (!createResponse.acknowledged) {
         throw new Error("Channel not created")
     }
@@ -96,7 +112,7 @@ export async function createChannel(channelName, username) {
  * @returns {Promise<void>}
  */
 export async function addUserToChannel(channelName, username) {
-    let res = await db.collection("channels").findOne({channelName: channelName});
+    let res = await db.collection("channels").findOne({name: channelName});
     if (!res) {
         throw new Error("Channel not found");
     }
@@ -104,7 +120,7 @@ export async function addUserToChannel(channelName, username) {
     if (isUserPresent) {
         throw new Error("User already in channel");
     }
-    let updateResponse = await db.collection("channels").updateOne({channelName: channelName}, {$push: {users: username}});
+    let updateResponse = await db.collection("channels").updateOne({name: channelName}, {$push: {users: username}});
     console.log(updateResponse);
     if (!updateResponse.acknowledged) {
         throw new Error("User not added to channel")

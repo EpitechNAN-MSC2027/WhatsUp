@@ -1,5 +1,6 @@
 import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
+import * as messageService from "../services/messageServices.js";
 
 /**
  * Socket success Response template
@@ -74,7 +75,7 @@ export async function retrieveUser(username) {
 
         let channelsAdmin = [];
         for (let channel of channelsCreated) {
-            channelsAdmin.push(channel.channelName);
+            channelsAdmin.push(channel.name);
         }
 
         let response = {
@@ -133,6 +134,8 @@ export async function listChannels(socket, filter) {
     try {
         const channels = await channelService.getChannels(filter);
 
+        console.log('channels:', channels);
+
         await successResponse(
             socket,
             'list',
@@ -159,16 +162,15 @@ export async function createChannel(socket, channel) {
     console.log(`Creating channel: ${channel}`);
 
     try {
-        try {
-            await userService.joinChannel(socket.user.username, channel);
-        } catch (error) {
-            console.log(error);
-        }
-
         const channel_created = await channelService.createChannel(channel, socket.user.username);
+        await userService.joinChannel(socket.user.username, channel);
+
+        console.log('channel created:', channel_created);
 
         await updateUser(socket);
         await sendChannels(socket, socket.user.channels);
+
+        await connectChannel(socket, channel);
 
         await successResponse(
             socket,
@@ -222,23 +224,24 @@ export async function connectChannel(socket, channel) {
     try {
         socket.channel = await channelService.getChannel(channel);
         console.log('Connected channel:', socket.channel);
-        socket.join(socket.channel.channelName);
+        socket.join(socket.channel.name);
 
+        socket.emit('channel', socket.channel.name);
         socket.emit('users', socket.channel.users);
 
-        await successResponse(
-            socket,
-            'connect',
-            `Successfully connect to channel: ${socket.channel.channelName}`,
-            socket.channel.channelName,
-        )
+        let messages = await messageService.getAllMessagesFromChannel(socket.channel.name);
+
+        console.log(`${channel} messages:`, messages);
+
+        let history = []
+        for (let msg of messages) {
+            console.log('msg:', msg);
+            history.push(`${msg.sender}: ${msg.message}`);
+        }
+
+        socket.emit('history', history);
     } catch (error) {
-        await errorResponse(
-            socket,
-            'connect',
-            `${error}`,
-            null,
-        )
+        throw error;
     }
 
 }
@@ -251,7 +254,6 @@ export async function connectChannel(socket, channel) {
  */
 export async function joinChannel(socket, channel) {
     console.log(`Joining channel: ${channel}`);
-
 
     try {
         // To modify
@@ -295,9 +297,22 @@ export async function joinChannel(socket, channel) {
 export async function quitChannel(socket, channel) {
     console.log(`Quitting channel: ${channel}`);
 
+    console.log("socket.channel: ", socket.channel);
+
+    if (channel === 'general') {
+        await errorResponse(
+            socket,
+            'error',
+            `Can't quit channel general`,
+            null,
+        )
+        return;
+    }
+
     try {
-        if (channelService.getChannel(channel)) {
-            if (socket.channel.channelName === channel) {
+        let channelToQuit = await channelService.getChannel(channel);
+        if (channelToQuit) {
+            if (socket.channel.name === channel) {
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
             }
@@ -335,7 +350,7 @@ export async function listUsers(socket) {
     console.log('Listing users');
 
     try {
-        const users = await channelService.getChannelUsers(socket.channel.channelName);
+        const users = await channelService.getChannelUsers(socket.channel.name);
 
         await successResponse(
             socket,
@@ -403,15 +418,17 @@ export async function sendMessage(io, socket, message) {
     console.log('socket.user.nickname:', socket.user.nickname);
 
     try {
-        if (socket.channel.channelName) {
-            io.to(socket.channel.channelName).emit('message',
-                `${socket.user.nickname}: ${message}`,
+        if (socket.channel.name) {
+            messageService.writeMessage(socket.user.username, socket.channel.name, message);
+
+            io.to(socket.channel.name).emit('message',
+                `${socket.user.nickname}: ${message}`
             );
 
             await successResponse(
                 socket,
                 'message',
-                `Message sent successfully in ${socket.channel.channelName}`,
+                `Message sent successfully in ${socket.channel.name}`,
                 null,
             )
         } else {
