@@ -267,7 +267,9 @@ export async function joinChannel(socket, channel) {
     console.log(`Joining channel: ${channel}`);
 
     try {
-        // To modify
+        // Vérifier si l'utilisateur est déjà membre du canal
+        const isAlreadyMember = socket.user.channels.includes(channel);
+        
         try {
             await channelService.addUserToChannel(channel, socket.user.username);
             await userService.joinChannel(socket.user.username, channel);
@@ -280,24 +282,26 @@ export async function joinChannel(socket, channel) {
 
         await connectChannel(socket, channel);
 
-        socket.to(channel).emit('userJoined', socket.user.nickname || socket.user.username);
+        // N'envoyer la notification que si c'est un nouveau membre
+        if (!isAlreadyMember) {
+            socket.to(channel).emit('userJoined', socket.user.nickname || socket.user.username);
+        }
 
         await successResponse(
             socket,
             'join',
             `Successfully joined channel ${channel}`,
             channel,
-        )
+        );
 
     } catch (error) {
         console.log(error);
-
         await errorResponse(
             socket,
             'join',
             `${error}`,
             null,
-        )
+        );
     }
 }
 

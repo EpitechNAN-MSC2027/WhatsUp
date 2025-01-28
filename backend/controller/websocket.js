@@ -65,11 +65,6 @@ export function createWebsocketServer(server) {
         socket.on('move', async (channel) => {
             const previousChannel = socket.channel?.name;
             await commands.connectChannel(socket, channel);
-            
-            // Notifier les autres utilisateurs du nouveau canal
-            if (socket.channel?.name) {
-                socket.to(socket.channel.name).emit('userJoined', socket.user.nickname);
-            }
         })
 
         socket.on('input', async (input) => {
