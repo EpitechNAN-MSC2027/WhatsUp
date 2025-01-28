@@ -10,7 +10,7 @@ export const config = async () => {
     await db.createCollection("messages");
     await db.createCollection("channels");
     await db.createCollection("users");
-    await db.createCollection("privateChannels");
+    await db.createCollection("privateMessages");
 
     await initGeneralChannel(db);
 };
