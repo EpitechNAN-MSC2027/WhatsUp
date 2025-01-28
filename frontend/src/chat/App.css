@@ -198,6 +198,21 @@ h2 {
     background-color: #e6a5ab;
 }
 
+.system-notification {
+    text-align: center;
+    color: #5ab6db;
+    font-style: italic;
+    padding: 5px;
+    margin: 5px 0;
+    background-color: rgba(90, 182, 219, 0.1);
+    border-radius: 4px;
+    font-family: "PT Serif", serif;
+}
+.message.system-notification {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
 /* Ajuster les styles pour la responsivité */
 @media (max-width: 1200px) {
     .sidebar {
@@ -226,21 +241,4 @@ h2 {
         width: 65%;
         padding: 10px;
     }
-}
-
-/* Ajouter ces styles */
-.system-notification {
-    text-align: center;
-    color: #5ab6db;
-    font-style: italic;
-    padding: 5px;
-    margin: 5px 0;
-    background-color: rgba(90, 182, 219, 0.1);
-    border-radius: 4px;
-    font-family: "PT Serif", serif;
-}
-
-.message.system-notification {
-    font-size: 0.9em;
-    opacity: 0.8;
 }
