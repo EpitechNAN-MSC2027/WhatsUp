@@ -269,6 +269,8 @@ export async function joinChannel(socket, channel) {
 
         await connectChannel(socket, channel);
 
+        socket.to(channel).emit('userJoined', socket.user.nickname);
+
         await successResponse(
             socket,
             'join',
