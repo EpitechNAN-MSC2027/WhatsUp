@@ -78,11 +78,10 @@ export function decodeToken(token) {
 
 /**
  * Checks with a token if a user is an admin of a channel
- * @param user
+ * @param user {User} the user
  * @param channel the targeted channel
  * @returns {boolean} true if the user is an admin of the channel
  */
 export function isUserAuthorizedOnChannel(user, channel){
-    console.log(user.channelsAdmin);
-    return user.channelsAdmin.includes(channel);
+    return channel.administrator === user.username;
 }

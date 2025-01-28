@@ -1,5 +1,13 @@
+
 class Message {
 
+    /**
+     *
+     * @param message {string}
+     * @param sender {string}
+     * @param channel {string}
+     * @param date {Date}
+     */
     constructor(message, sender, channel, date) {
         this.message = message;
         this.sender = sender;

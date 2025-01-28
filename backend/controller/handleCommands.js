@@ -198,7 +198,7 @@ export async function deleteChannel(socket, channel) {
     console.log(`Deleting channel: ${channel}`);
 
     try {
-        await channelService.deleteChannel(socket.user, channel);
+        await channelService.deleteChannel(channel, socket.user);
         console.log('Successfully deleting channel');
 
         await updateUser(socket);
