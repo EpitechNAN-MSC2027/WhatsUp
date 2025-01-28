@@ -40,31 +40,20 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
             timestamp: new Date().toISOString(),
         });
 
-        // Charger l'avatar depuis le localStorage d'abord
+        // Récupérer l'avatar depuis le localStorage d'abord
         const savedAvatar = localStorage.getItem('avatarParts');
         if (savedAvatar) {
             setUserAvatar(JSON.parse(savedAvatar));
         }
 
-        // Puis vérifier s'il y a des mises à jour depuis le serveur
-        const loadUserAvatar = async () => {
-            try {
-                const response = await fetch(`http://localhost:3000/get-avatar/${localStorage.getItem('username')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                const data = await response.json();
-                if (data.success) {
-                    setUserAvatar(data.avatarParts);
-                    localStorage.setItem('avatarParts', JSON.stringify(data.avatarParts));
-                }
-            } catch (error) {
-                console.error('Erreur lors du chargement de l\'avatar');
+        // Demander l'avatar au serveur
+        newSocket.emit('get-avatar');
+        newSocket.on('avatar-data', (response) => {
+            if (response.success) {
+                setUserAvatar(response.avatarData);
+                localStorage.setItem('avatarParts', JSON.stringify(response.avatarData));
             }
-        };
-
-        loadUserAvatar();
+        });
 
         return () => newSocket.disconnect();
     }, [onChannelChange, onMembersChange]);

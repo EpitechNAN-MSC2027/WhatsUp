@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 import './avatar.css';
 
 const AvatarCustomization = ({ onComplete }) => {
     const avatarParts = {
         body: [
-            '/avatars/body1.png',
-            '/avatars/body2.png',
-            '/avatars/body3.png',
-            '/avatars/body4.png',
-            '/avatars/body5.png'
+            '../../public/avatars/body1.png',
+            '../../public/avatars/body2.png',
+            '../../public/avatars/body3.png',
+            '../../public/avatars/body4.png',
+            '../../public/avatars/body5.png'
         ],
         eyes: [
             '/avatars/eyes1.png',
@@ -40,6 +41,7 @@ const AvatarCustomization = ({ onComplete }) => {
         ]
     };
 
+    const [socket, setSocket] = useState(null);
     const [avatar, setAvatar] = useState(
         Object.keys(avatarParts).reduce((acc, part) => {
             acc[part] = {
@@ -49,6 +51,17 @@ const AvatarCustomization = ({ onComplete }) => {
             return acc;
         }, {})
     );
+
+    useEffect(() => {
+        const newSocket = io('http://localhost:3000', {
+            auth: {
+                token: localStorage.getItem('token'),
+            }
+        });
+        setSocket(newSocket);
+
+        return () => newSocket.disconnect();
+    }, []);
 
     const handlePartChange = (part, direction) => {
         setAvatar(prev => {
@@ -69,17 +82,22 @@ const AvatarCustomization = ({ onComplete }) => {
     };
 
     const handleSave = () => {
-        try {
-            const avatarState = Object.keys(avatar).reduce((acc, part) => {
-                acc[part] = avatar[part].currentIndex + 1;
-                return acc;
-            }, {});
-            
-            localStorage.setItem('avatarParts', JSON.stringify(avatarState));
-            onComplete();
-        } catch (error) {
-            alert('Erreur lors de la sauvegarde de l\'avatar');
-        }
+        if (!socket) return;
+
+        const avatarState = Object.keys(avatar).reduce((acc, part) => {
+            acc[part] = avatar[part].currentIndex + 1;
+            return acc;
+        }, {});
+
+        socket.emit('save-avatar', avatarState);
+        socket.once('avatar-saved', (response) => {
+            if (response.success) {
+                localStorage.setItem('avatarParts', JSON.stringify(avatarState));
+                onComplete();
+            } else {
+                alert('Erreur lors de la sauvegarde de l\'avatar');
+            }
+        });
     };
 
     return (
