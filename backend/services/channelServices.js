@@ -8,7 +8,7 @@ import {Channel} from "../models/channel.js";
  * @returns {Promise<void>}
  * @throws Error if the channel was not created
  */
-export async function initGeneralChannel(db) {
+export async function initGeneralChannel() {
     let res = await db.collection("channels").findOne({name: "general"});
     if (!res) {
         console.log("Creating general channel");
@@ -66,8 +66,10 @@ export async function getChannel(channelName) {
  * @throws an error if the channel was not found
  */
 export async function deleteChannel(channelName, user)  {
-    if (isUserAuthorizedOnChannel(user, channelName)) {
+    let channel = await getChannel(channelName);
+    if (isUserAuthorizedOnChannel(user, channel)) {
         let channelResponse = await db.collection("channels").deleteOne({name: channelName});
+        console.log("channelResponse:", channelResponse);
         if (!channelResponse.acknowledged) {
             throw new Error("Channel not found")
         }
@@ -151,7 +153,7 @@ export async function removeUserFromChannel(channelName, username) {
  */
 export async function getChannelUsers(channelName) {
     let res = await db.collection("channels").findOne({name: channelName});
-    if( res.length === 0 ) {
+    if( !res ) {
         throw new Error("Channel not found");
     }
     return res.users;
