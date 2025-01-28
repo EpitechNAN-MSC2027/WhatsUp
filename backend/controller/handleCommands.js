@@ -203,12 +203,15 @@ export async function deleteChannel(socket, channel) {
         await channelService.deleteChannel(channel, socket.user);
         console.log('Successfully deleting channel');
 
+        if (socket.channel.name === channel) {
+            await connectChannel(socket, 'general');
+        }
+
         for (let user of members) {
             userService.leaveChannel(user, channel);
         }
 
         await updateUser(socket);
-        await connectChannel(socket, channel);
         await sendChannels(socket, socket.user.channels);
 
         await successResponse(
@@ -218,6 +221,7 @@ export async function deleteChannel(socket, channel) {
             channel,
         )
     } catch (error) {
+        console.log(error);
         await errorResponse(
             socket,
             'delete',
