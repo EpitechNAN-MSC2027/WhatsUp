@@ -90,6 +90,12 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }
         });
 
+        socket.on('privateChannelCreated', (data) => {
+            console.log('Canal privé créé:', data);
+            // Le canal sera automatiquement ajouté via l'événement 'channels'
+            // et le chat sera mis à jour via l'événement 'channel'
+        });
+
         return () => {
             socket.off('message');
             socket.off('response');
@@ -97,6 +103,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             socket.off('channel');
             socket.off('userJoined');
             socket.off('userLeft');
+            socket.off('privateChannelCreated');
         };
     }, [socket]);
 
@@ -114,42 +121,30 @@ const ChatWindow = ({ currentChannel, socket }) => {
 
     const handleSendMessage = () => {
         if (!input.trim() || !socket) return;
-
-        // Vérifier si c'est un message privé (@nickname)
-        const privateMessageMatch = input.match(/^@(\w+)\s+(.+)/);
+    
+        // Check if it's a private message (@nickname or /msg)
+        const privateMessageMatch = input.match(/^[@/](?:msg\s+)?(\w+)\s+(.+)/);
         if (privateMessageMatch) {
             const [, nickname, message] = privateMessageMatch;
-            console.log('Message privé détecté:', { nickname, message });
+            console.log('Private message detected:', { nickname, message });
             
-            // Envoyer explicitement comme une commande msg
+            // Create/join a private channel
             const commandData = {
-                command: 'msg',
+                command: 'private',
                 args: [nickname, message]
             };
-            console.log('Envoi de la commande au serveur:', commandData);
-            
             socket.emit('command', commandData);
-            
-            // Ajouter le message à l'historique local
-            const localMessage = `${localStorage.getItem('username')} : ${message}`;
-            console.log('Ajout du message local:', localMessage);
-            
-            setMessages(prevMessages => [...prevMessages, {
-                text: localMessage,
-                type: 'private'
-            }]);
         } else {
-            console.log('Message normal:', input);
+            console.log('Normal message:', input);
             socket.emit('input', {
                 data: input,
                 timestamp: new Date().toISOString()
             });
         }
-
+    
         setInput('');
         setCommandSuggestions([]);
     };
-
 
     const handleInputChange = (e) => {
         const userInput = e.target.value;
@@ -205,10 +200,6 @@ const ChatWindow = ({ currentChannel, socket }) => {
                                         <li key={idx}>{channel}</li>
                                     ))}
                                 </ul>
-                            </div>
-                        ) : msg.type === 'system-notification' ? (
-                            <div className="system-notification">
-                                {msg.text}
                             </div>
                         ) : msg.sender ? (
                             <>

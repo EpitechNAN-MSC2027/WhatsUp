@@ -162,6 +162,12 @@ export function createWebsocketServer(server) {
                         await commands.messageUser(io, socket, user, message);
                         break;
 
+
+                        const targetUser = args[0];
+                        const privateMessage = args[1];
+                        await commands.handlePrivateMessage(socket, targetUser, privateMessage);
+                        break;
+
                     default:
                         console.error(`Unknown command: ${command}`);
 

@@ -470,3 +470,58 @@ export async function sendMessage(io, socket, message) {
         )
     }
 }
+
+/**
+ * Crée ou rejoint un canal privé et envoie un message
+ * @param socket
+ * @param targetUser
+ * @param message
+ * @returns {Promise<void>}
+ */
+export async function handlePrivateMessage(socket, targetUser, message) {
+    try {
+        const sender = socket.user.username;
+        const privateChannelName = [sender, targetUser].sort().join('_private_');
+
+        // Vérifier si le canal privé existe déjà
+        let privateChannel;
+        try {
+            privateChannel = await channelService.getChannel(privateChannelName);
+        } catch (error) {
+            // Créer le canal privé s'il n'existe pas
+            privateChannel = await channelService.createPrivateChannel(privateChannelName, sender, targetUser);
+            await userService.joinChannel(sender, privateChannelName);
+            await userService.joinChannel(targetUser, privateChannelName);
+        }
+
+        // Connecter l'utilisateur au canal privé
+        await connectChannel(socket, privateChannelName);
+
+        // Mettre à jour la liste des canaux de l'utilisateur
+        await updateUser(socket);
+        await sendChannels(socket, socket.user.channels);
+
+        // Envoyer le message
+        await sendMessage(socket.server, socket, message);
+
+        // Émettre un événement spécifique pour le canal privé
+        socket.emit('privateChannelCreated', {
+            channelName: privateChannelName,
+            users: [sender, targetUser]
+        });
+
+        await successResponse(
+            socket,
+            'private',
+            'Private channel created/joined successfully',
+            privateChannelName
+        );
+    } catch (error) {
+        await errorResponse(
+            socket,
+            'private',
+            `${error}`,
+            null
+        );
+    }
+}
