@@ -231,7 +231,15 @@ export async function connectChannel(socket, channel) {
 
         let messages = await messageService.getAllMessagesFromChannel(socket.channel.name);
 
-        socket.emit('messages', messages);
+        console.log(`${channel} messages:`, messages);
+
+        let history = []
+        for (let msg of messages) {
+            console.log('msg:', msg);
+            history.push(`${msg.sender}: ${msg.message}`);
+        }
+
+        socket.emit('history', history);
     } catch (error) {
         throw error;
     }
@@ -291,8 +299,19 @@ export async function quitChannel(socket, channel) {
 
     console.log("socket.channel: ", socket.channel);
 
+    if (channel === 'general') {
+        await errorResponse(
+            socket,
+            'error',
+            `Can't quit channel general`,
+            null,
+        )
+        return;
+    }
+
     try {
-        if (channelService.getChannel(channel)) {
+        let channelToQuit = await channelService.getChannel(channel);
+        if (channelToQuit) {
             if (socket.channel.name === channel) {
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
@@ -403,7 +422,7 @@ export async function sendMessage(io, socket, message) {
             messageService.writeMessage(socket.user.username, socket.channel.name, message);
 
             io.to(socket.channel.name).emit('message',
-                `${socket.user.nickname}: ${message}`,
+                `${socket.user.nickname}: ${message}`
             );
 
             await successResponse(

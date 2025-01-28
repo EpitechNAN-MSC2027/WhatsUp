@@ -1,0 +1,46 @@
+.avatar-container {
+    width: 400px;
+    height: 600px;
+    position: relative;
+    border: 1px solid black;
+}
+
+.avatar-image-container {
+    position: absolute;
+    width: 100%;
+    height: 400px;
+}
+
+.avatar-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.avatar-navigation {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.part-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.part-navigation button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    margin: 0 10px;
+}
+
+.part-navigation span {
+    font-weight: bold;
+    text-transform: capitalize;
+}
