@@ -2,7 +2,6 @@
 class Message {
 
     /**
-     *
      * @param message {string}
      * @param sender {string}
      * @param channel {string}
