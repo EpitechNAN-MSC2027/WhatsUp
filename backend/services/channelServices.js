@@ -61,8 +61,8 @@ export async function getChannel(channelName) {
 
 /**
  * Deletes a Channel and all messages associated with it
- * @param channelName
- * @param user
+ * @param channelName {string}
+ * @param user {User}
  * @throws an error if the channel was not found
  */
 export async function deleteChannel(channelName, user)  {
