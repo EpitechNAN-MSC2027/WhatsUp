@@ -95,7 +95,7 @@ export async function createChannel(channelName, username) {
         throw new Error("Channel already exists");
     }
 
-    let channel = new Channel(channelName, username, [], [username]);
+    let channel = new Channel(channelName, username, [username]);
 
     console.log("new Channel Object created:", channel);
 

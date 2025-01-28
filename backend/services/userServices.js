@@ -45,7 +45,7 @@ export async function updateNickname(username, nickname) {
  * @returns {UpdateResult<Document>}
  */
 export async function joinChannel(username, channel) {
-    const user = db.colleciton("users").findOne({username: username});
+    const user = await db.collection("users").findOne({username: username});
     if( user === null ) {
         throw new Error("User not found");
     }
