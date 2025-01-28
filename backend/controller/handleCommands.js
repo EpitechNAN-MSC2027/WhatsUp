@@ -1,7 +1,6 @@
 import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
 import * as messageService from "../services/messageServices.js";
-import {getChannelUsers, removeUserFromChannel} from "../services/channelServices.js";
 
 /**
  * Socket success Response template
@@ -201,7 +200,7 @@ export async function deleteChannel(socket, channel) {
     try {
         let members = await channelService.getChannelUsers(channel);
 
-        await channelService.deleteChannel(socket.user, channel);
+        await channelService.deleteChannel(channel, socket.user);
         console.log('Successfully deleting channel');
 
         for (let user of members) {
