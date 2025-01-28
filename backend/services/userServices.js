@@ -42,9 +42,17 @@ export async function updateNickname(username, nickname) {
  * Adds a channel to a user
  * @param username
  * @param channel
- * @returns {Promise<UpdateResult<Document>>}
+ * @returns {UpdateResult<Document>}
  */
 export async function joinChannel(username, channel) {
+    const user = db.colleciton("users").findOne({username: username});
+    if( user === null ) {
+        throw new Error("User not found");
+    }
+    if( user.channels.includes(channel) ) {
+        throw new Error("User already in channel");
+    }
+
     return await db.collection("users").updateOne({username: username}, {$push: {channels: channel}});
 }
 
