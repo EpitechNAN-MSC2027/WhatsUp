@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AvatarCustomization from '../../avatar';
 
 const SignUpForm = ({ switchToSignIn }) => {
+    const [showAvatar, setShowAvatar] = useState(false);
+    const [registeredUsername, setRegisteredUsername] = useState('');
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -24,8 +28,10 @@ const SignUpForm = ({ switchToSignIn }) => {
 
             const result = await response.json();
             if (result.success) {
-                alert('Account created successfully!');
-                switchToSignIn();
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('username', username);
+                setRegisteredUsername(username);
+                setShowAvatar(true);
             } else {
                 alert(result.message);
             }
@@ -33,6 +39,15 @@ const SignUpForm = ({ switchToSignIn }) => {
             alert('Erreur lors de la création du compte.');
         }
     };
+
+    const handleAvatarComplete = () => {
+        alert('Compte créé avec succès!');
+        switchToSignIn();
+    };
+
+    if (showAvatar) {
+        return <AvatarCustomization onComplete={handleAvatarComplete} />;
+    }
 
     return (
         <form className="form_login" onSubmit={handleSubmit}>

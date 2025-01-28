@@ -7,6 +7,7 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
     const [socket, setSocket] = useState(null);
     const [currentChannel, setCurrentChannel] = useState(null);
     const [channelMembers, setChannelMembers] = useState([]);
+    const [userAvatar, setUserAvatar] = useState(null);
 
     useEffect(() => {
         const newSocket = io('http://localhost:3000', {
@@ -39,6 +40,32 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
             timestamp: new Date().toISOString(),
         });
 
+        // Charger l'avatar depuis le localStorage d'abord
+        const savedAvatar = localStorage.getItem('avatarParts');
+        if (savedAvatar) {
+            setUserAvatar(JSON.parse(savedAvatar));
+        }
+
+        // Puis vérifier s'il y a des mises à jour depuis le serveur
+        const loadUserAvatar = async () => {
+            try {
+                const response = await fetch(`http://localhost:3000/get-avatar/${localStorage.getItem('username')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    setUserAvatar(data.avatarParts);
+                    localStorage.setItem('avatarParts', JSON.stringify(data.avatarParts));
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de l\'avatar');
+            }
+        };
+
+        loadUserAvatar();
+
         return () => newSocket.disconnect();
     }, [onChannelChange, onMembersChange]);
 
@@ -53,6 +80,19 @@ const LeftSideBar = ({ onChannelChange, onMembersChange }) => {
 
     return (
         <div className="sidebar">
+            <div className="user-profile">
+                <div className="avatar-container-small">
+                    {userAvatar && Object.entries(userAvatar).map(([part, index]) => (
+                        <img 
+                            key={part}
+                            className="avatar-image"
+                            src={`../../public/avatars/${part}${index}.png`}
+                            alt={part}
+                        />
+                    ))}
+                </div>
+                <span>{localStorage.getItem('username')}</span>
+            </div>
             <h3>My channels</h3>
             <ul className="channel-list">
                 {joinedChannels.map((channel, index) => (

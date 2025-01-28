@@ -16,12 +16,23 @@ const SignInForm = ({ switchToSignUp, navigateToChat }) => {
             });
 
             const result = await response.json();
-            console.log(result);
-
-            localStorage.setItem('token', result.token);
-            localStorage.setItem('username', username);
 
             if (result.success) {
+                localStorage.setItem('token', result.token);
+                localStorage.setItem('username', username);
+                
+                // Récupérer l'avatar après la connexion
+                const avatarResponse = await fetch(`http://localhost:3000/get-avatar/${username}`, {
+                    headers: {
+                        'Authorization': `Bearer ${result.token}`
+                    }
+                });
+                const avatarData = await avatarResponse.json();
+                
+                if (avatarData.success) {
+                    localStorage.setItem('avatarParts', JSON.stringify(avatarData.avatarParts));
+                }
+                
                 navigateToChat();
             } else {
                 alert(result.message);
