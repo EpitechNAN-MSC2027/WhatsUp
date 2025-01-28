@@ -4,7 +4,7 @@ import {createUser, getUser, deleteUser, updateNickname, joinChannel, leaveChann
 import {User} from "../models/user.js";
 import {config} from "./utils.mjs";
 
-beforeEach(config);
+beforeEach(await config);
 
 test("createUser should create a new user", async () => {
     const user = new User("user1", "password1", "nickname1", []);
