@@ -13,7 +13,7 @@ A **real-time chat application** built using the **MERN stack** (MongoDB, Expres
 
 ## Technologies Used
 
-- **Frontend**: React, TailwindCSS
+- **Frontend**: React
 - **Backend**: Node.js, Express.js
 - **Database**: MongoDB (with Mongo Express for DB management)
 - **Real-time Communication**: Socket.IO
@@ -25,7 +25,7 @@ A **real-time chat application** built using the **MERN stack** (MongoDB, Expres
 
 Ensure you have the following installed:
 
-- [Node.js](https://nodejs.org/) (version 16 or later)
+- [Node.js](https://nodejs.org/) (version 22)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
@@ -36,7 +36,7 @@ Ensure you have the following installed:
 ### 1. Clone the repository:
 ```bash
 git clone https://github.com/yourusername/mern-chat-app.git
-cd mern-chat-app
+cd WhatsUp
 ```
 
 ### 2. Set up environment variables:
@@ -44,20 +44,14 @@ Create a `.env` file in both the `backend` and `frontend` directories with the r
 
 #### Example `.env` for `backend`:
 ```env
-PORT=5000
-MONGO_URI=mongodb://mongo:27017/mern_chat
 JWT_SECRET=your_jwt_secret
 ```
 
-#### Example `.env` for `frontend`:
-```env
-REACT_APP_API_URL=http://localhost:5000
-```
 
 ### 3. Start Docker containers:
 Navigate to the root of the project and run:
 ```bash
-docker-compose up -d
+docker-compose up -d mongo mongo-express
 ```
 This will start the MongoDB and Mongo Express services.
 
@@ -80,13 +74,13 @@ npm install
 #### Backend:
 ```bash
 cd backend
-npm run dev
+node app.js
 ```
 
 #### Frontend:
 ```bash
 cd frontend
-npm start
+npm run dev
 ```
 
 ---
@@ -96,26 +90,26 @@ npm start
 Here’s the `docker-compose.yml` file for setting up MongoDB and Mongo Express:
 
 ```yaml
-version: '3.8'
 services:
   mongo:
-    image: mongo:5
-    container_name: mongo
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
     ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
-  
+        - "27017:27017"
+
   mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
+    image: mongo-express
+    restart: always
     ports:
       - "8081:8081"
     environment:
-      - ME_CONFIG_MONGODB_SERVER=mongo
-
-volumes:
-  mongo_data:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: false
 ```
 
 ---
@@ -123,8 +117,8 @@ volumes:
 ## Usage
 
 1. **Access the app**:
-   - Frontend: Open [http://localhost:3000](http://localhost:3000) in your browser.
-   - Backend API: Access API routes at [http://localhost:5000](http://localhost:5000).
+   - Frontend: Open [http://localhost:5173](http://localhost:5173) in your browser.
+   - Backend API: Access API routes at [http://localhost:3000](http://localhost:3000).
 
 2. **MongoDB Management**:
    - Mongo Express: Open [http://localhost:8081](http://localhost:8081) to manage your MongoDB database through a web UI.
@@ -134,10 +128,10 @@ volumes:
 ## Scripts
 
 ### Backend
-- `npm run dev`: Start the backend server in development mode.
+- `node app.js`: Start the backend server in development mode.
 
 ### Frontend
-- `npm start`: Start the React development server.
+- `npm run dev`: Start the React development server.
 
 ---
 
@@ -148,7 +142,7 @@ mern-chat-app/
 ├── backend/
 │   ├── controllers/
 │   ├── models/
-│   ├── routes/
+│   ├── services/
 │   ├── .env
-│   ├── server.js
-├── front
+│   ├── app.js
+├── front/
