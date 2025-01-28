@@ -1,5 +1,5 @@
 
-class Message {
+export class Message {
 
     /**
      * @param message {string}
@@ -15,7 +15,7 @@ class Message {
     }
 
     static fromRow(row) {
-        return new Message(row.id, row.message, row.sender, row.receiver, row.date);
+        return new Message(row.message, row.sender, row.receiver, row.date);
     }
 
     toConst() {

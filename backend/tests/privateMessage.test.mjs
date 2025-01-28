@@ -7,20 +7,34 @@ import {Message} from "../models/message.js";
 import {config} from "./utils.mjs";
 
 beforeEach(config);
+const user = new User("user1", "password1", "nickname1", []);
+const user2 = new User("user2", "password2", "nickname2", []);
+const user3 = new User("user3", "password3", "nickname3", []);
+const user4 = new User("user4", "password4", "nickname4", []);
+const channel1 = new PrivateChannel("channel1", user, user2);
+const channel2 = new PrivateChannel("channel2", user3, user4 );
+const channel3 = new PrivateChannel("channel3", user2, user);
+const channel4 = new PrivateChannel("channel4", user, user);
+
+async function configPrivateChannels() {
+    await createPrivateChannel(channel1);
+    await createPrivateChannel(channel2);
+
+}
+
+
 
 test("createPrivateChannel should create a new private channel", async () => {
-    const channel = new PrivateChannel("channel1", ["user1", "user2"]);
-    await createPrivateChannel(channel);
+    await createPrivateChannel(channel1);
     const createdChannel = await db.collection("privateChannels").findOne({name: "channel1"});
     expect(createdChannel).not.toBeNull();
     expect(createdChannel.name).toBe("channel1");
-    expect(createdChannel.users).toContain("user1");
-    expect(createdChannel.users).toContain("user2");
+    expect(createdChannel.users[0]).toEqual(user.toConst());
+    expect(createdChannel.users[1]).toEqual(user2.toConst());
 });
 
 test("createPrivateChannel should throw error if users are the same", async () => {
-    const channel = new PrivateChannel("channel1", ["user1", "user1"]);
-    await expect(createPrivateChannel(channel)).rejects.toThrow("Private channels must have different users");
+    await expect(createPrivateChannel(channel4)).rejects.toThrow("Private channels must have different users");
 });
 
 test("createPrivateChannel should throw error if users are invalid", async () => {
@@ -29,14 +43,11 @@ test("createPrivateChannel should throw error if users are invalid", async () =>
 });
 
 test("createPrivateChannel should throw error if channel already exists", async () => {
-    const channel = new PrivateChannel("channel1", ["user1", "user2"]);
-    await createPrivateChannel(channel);
-    await expect(createPrivateChannel(channel)).rejects.toThrow("Channel already exists");
+    await createPrivateChannel(channel1);
+    await expect(createPrivateChannel(channel1)).rejects.toThrow("Channel already exists");
 });
 
 test("getPrivateChannels should return all private channels", async () => {
-    const channel1 = new PrivateChannel("channel1", ["user1", "user2"]);
-    const channel2 = new PrivateChannel("channel2", ["user3", "user4"]);
     await createPrivateChannel(channel1);
     await createPrivateChannel(channel2);
     const channels = await getPrivateChannels();
@@ -46,13 +57,12 @@ test("getPrivateChannels should return all private channels", async () => {
 });
 
 test("getPrivateChannel should return the correct private channel", async () => {
-    const channel = new PrivateChannel("channel1", ["user1", "user2"]);
-    await createPrivateChannel(channel);
+    await createPrivateChannel(channel1);
     const fetchedChannel = await getPrivateChannel("channel1");
     expect(fetchedChannel).not.toBeNull();
     expect(fetchedChannel.name).toBe("channel1");
-    expect(fetchedChannel.users).toContain("user1");
-    expect(fetchedChannel.users).toContain("user2");
+    expect(fetchedChannel.users[0]).toEqual(user);
+    expect(fetchedChannel.users[1]).toEqual(user2);
 });
 
 test("getPrivateChannel should throw error if channel not found", async () => {
@@ -60,10 +70,10 @@ test("getPrivateChannel should throw error if channel not found", async () => {
 });
 
 test("writeMessageToUser should create a message in the private channel", async () => {
-    const sender = new User("user1", "password1", "nickname1", []);
-    const receiver = new User("user2", "password2", "nickname2", []);
-    await writeMessageToUser(sender, receiver, "Hello");
-    const channel = await db.collection("privateChannels").findOne({users: {$all: ["user1", "user2"]}});
+    let res = await writeMessageToUser(user, user2, "Hello");
+    console.log(res)
+    const channel = await db.collection("privateChannels").findOne({users: [user, user2]});
+    console.log(channel);
     expect(channel.messages.length).toBe(1);
     expect(channel.messages[0].message).toBe("Hello");
 });
@@ -84,7 +94,7 @@ test("getAllMessagesFromPrivateChannel should throw error if channel not found",
 });
 
 test("deletePrivateChannel should delete the private channel", async () => {
-    const channel = new PrivateChannel("channel1", ["user1", "user2"]);
+    const channel = new PrivateChannel("channel1", "user1", "user2");
     await createPrivateChannel(channel);
     await deletePrivateChannel("channel1");
     const deletedChannel = await db.collection("privateChannels").findOne({name: "channel1"});

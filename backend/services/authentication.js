@@ -73,8 +73,7 @@ export async function registerUser(username, password, nickname) {
  * @returns {{payload: *, signature: *, header: *}|*}
  */
 export function decodeToken(token) {
-    return jwt.decode(token, secretKey);
-}
+    return jwt.decode(token, secretKey);}
 
 /**
  * Checks with a token if a user is an admin of a channel
