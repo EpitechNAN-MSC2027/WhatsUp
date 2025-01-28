@@ -151,7 +151,7 @@ export async function removeUserFromChannel(channelName, username) {
  */
 export async function getChannelUsers(channelName) {
     let res = await db.collection("channels").findOne({name: channelName});
-    if( res.length === 0 ) {
+    if( !res ) {
         throw new Error("Channel not found");
     }
     return res.users;
@@ -163,7 +163,7 @@ export async function getChannelUsers(channelName) {
  * @returns
  */
 export async function getChannelsCreated(username) {
-    let res = await db.collection("channels").find({admin: username});
+    let res = await db.collection("channels").find({administrator: username});
     if (!res) {
         throw new Error("Channel not found");
     }

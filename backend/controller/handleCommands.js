@@ -1,6 +1,7 @@
 import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
 import * as messageService from "../services/messageServices.js";
+import {getChannelUsers, removeUserFromChannel} from "../services/channelServices.js";
 
 /**
  * Socket success Response template
@@ -198,10 +199,17 @@ export async function deleteChannel(socket, channel) {
     console.log(`Deleting channel: ${channel}`);
 
     try {
+        let members = await channelService.getChannelUsers(channel);
+
         await channelService.deleteChannel(socket.user, channel);
         console.log('Successfully deleting channel');
 
+        for (let user of members) {
+            userService.leaveChannel(user, channel);
+        }
+
         await updateUser(socket);
+        await connectChannel(socket, channel);
         await sendChannels(socket, socket.user.channels);
 
         await successResponse(
@@ -318,6 +326,7 @@ export async function quitChannel(socket, channel) {
             }
 
             await userService.leaveChannel(socket.user.username, channel);
+            await channelService.removeUserFromChannel(channel, socket.user.username);
 
             await updateUser(socket);
             await sendChannels(socket, socket.user.channels);
