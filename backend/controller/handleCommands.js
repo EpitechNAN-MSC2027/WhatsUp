@@ -198,8 +198,18 @@ export async function deleteChannel(socket, channel) {
     console.log(`Deleting channel: ${channel}`);
 
     try {
-        await channelService.deleteChannel(socket.user, channel);
+        let members = await channelService.getChannelUsers(channel);
+
+        await channelService.deleteChannel(channel, socket.user);
         console.log('Successfully deleting channel');
+
+        if (socket.channel.name === channel) {
+            await connectChannel(socket, 'general');
+        }
+
+        for (let user of members) {
+            userService.leaveChannel(user, channel);
+        }
 
         await updateUser(socket);
         await sendChannels(socket, socket.user.channels);
@@ -211,6 +221,7 @@ export async function deleteChannel(socket, channel) {
             channel,
         )
     } catch (error) {
+        console.log(error);
         await errorResponse(
             socket,
             'delete',
@@ -320,6 +331,7 @@ export async function quitChannel(socket, channel) {
             }
 
             await userService.leaveChannel(socket.user.username, channel);
+            await channelService.removeUserFromChannel(channel, socket.user.username);
 
             await updateUser(socket);
             await sendChannels(socket, socket.user.channels);

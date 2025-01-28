@@ -1,5 +1,10 @@
 export class Channel {
-    constructor(name, administrator, messages, users) {
+    /**
+     * @param {String} name
+     * @param {String} administrator
+     * @param {String[]} users
+     */
+    constructor(name, administrator, users) {
         this.name = name;
         this.administrator = administrator;
         this.users = users;

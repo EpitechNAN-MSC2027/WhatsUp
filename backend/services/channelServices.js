@@ -49,11 +49,11 @@ export async function getChannels(filter) {
 
 /**
  * @param channelName the name of the channel to check
- * @returns {String} the name of the channel
+ * @returns {Document & {_id: InferIdType<Document>}
  */
 export async function getChannel(channelName) {
     let res = await db.collection("channels").findOne({name: channelName});
-    if (!res) {
+    if (res == null) {
         throw new Error("Channel not found");
     }
     return res;
@@ -61,14 +61,16 @@ export async function getChannel(channelName) {
 
 /**
  * Deletes a Channel and all messages associated with it
- * @param user
- * @param channelName
+ * @param channelName {string}
+ * @param user {User}
  * @throws an error if the channel was not found
  */
-export async function deleteChannel(user, channelName)  {
-    if (isUserAuthorizedOnChannel(user, channelName)) {
+export async function deleteChannel(channelName, user)  {
+    let channel = await getChannel(channelName);
+    if (isUserAuthorizedOnChannel(user, channel)) {
         let channelResponse = await db.collection("channels").deleteOne({name: channelName});
-        if (channelResponse.deletedCount === 0) {
+        console.log("channelResponse:", channelResponse);
+        if (!channelResponse.acknowledged) {
             throw new Error("Channel not found")
         }
         let deletedMessagesCount =  (await db.collection("messages").deleteMany({name: channelName})).deletedCount;
@@ -95,7 +97,7 @@ export async function createChannel(channelName, username) {
         throw new Error("Channel already exists");
     }
 
-    let channel = new Channel(channelName, username, [], [username]);
+    let channel = new Channel(channelName, username, [username]);
 
     console.log("new Channel Object created:", channel);
 
@@ -147,11 +149,11 @@ export async function removeUserFromChannel(channelName, username) {
 /**
  * Gets all users from a channel
  * @param channelName
- * @returns {Promise<[*]|*>}
+ * @returns {User[]}
  */
 export async function getChannelUsers(channelName) {
     let res = await db.collection("channels").findOne({name: channelName});
-    if( res.length === 0 ) {
+    if( !res ) {
         throw new Error("Channel not found");
     }
     return res.users;
@@ -160,10 +162,10 @@ export async function getChannelUsers(channelName) {
 /**
  * Gets the creator of a channel
  * @param username
- * @returns
+ * @returns {WithId<Document>[]}
  */
 export async function getChannelsCreated(username) {
-    let res = await db.collection("channels").find({admin: username});
+    let res = await db.collection("channels").find({administrator: username});
     if (!res) {
         throw new Error("Channel not found");
     }
