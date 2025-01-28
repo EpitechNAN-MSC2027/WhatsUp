@@ -35,7 +35,7 @@ Ensure you have the following installed:
 
 ### 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/mern-chat-app.git
+git clone https://github.com/EpitechNAN-MSC2027/WhatsUp.git
 cd WhatsUp
 ```
 
