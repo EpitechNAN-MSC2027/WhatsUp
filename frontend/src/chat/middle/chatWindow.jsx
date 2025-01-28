@@ -45,10 +45,11 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }]);
         });
 
-        socket.on('userJoined', (username) => {
+        socket.on('userJoined', (nickname) => {
             setMessages(prevMessages => [...prevMessages, {
-                text: `${username} joined the channel :)`,
-                type: 'system-notification'
+                text: `${nickname} a rejoint le canal`,
+                type: 'notification',
+                timestamp: new Date().toISOString()
             }]);
         });
 
@@ -153,7 +154,11 @@ const ChatWindow = ({ currentChannel, socket }) => {
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages && messages.map((msg, index) => (
                     <div key={index} className={`message ${msg.type || 'received'}`}>
-                        {msg.channels ? (
+                        {msg.type === 'notification' ? (
+                            <div className="notification-message">
+                                {msg.text}
+                            </div>
+                        ) : msg.channels ? (
                             <div className="channel-list-message">
                                 <strong>{msg.text}</strong>
                                 <ul>
