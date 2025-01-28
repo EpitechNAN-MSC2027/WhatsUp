@@ -198,7 +198,7 @@ h2 {
     background-color: #e6a5ab;
 }
 
-.message.system-notification {
+.system-notification {
     text-align: center;
     color: #5ab6db;
     font-style: italic;
@@ -207,14 +207,15 @@ h2 {
     background-color: rgba(90, 182, 219, 0.1);
     border-radius: 4px;
     font-family: "PT Serif", serif;
+}
+.message.system-notification {
     font-size: 0.9em;
     opacity: 0.8;
 }
 
-.message.system-notification .system-notification {
-    /* Styles pour la div intérieure si nécessaire */
-    color: inherit;
-    font-style: inherit;
+.message.private {
+    color: red;
+    font-style: italic;
 }
 
 /* Ajuster les styles pour la responsivité */
