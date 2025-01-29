@@ -116,12 +116,12 @@ export const executeCommand = (socket, commandName, args) => {
         return;
     }
 
-    if (!validateArgs(commandName, args, command.argsConfig)) {
+    if (!validateArgs(commandName, args, command['argsConfig'])) {
         return;
     }
 
     try {
-        command.handler(socket, args);
+        command['handler'](socket, args);
     } catch (error) {
         console.error(`Error executing command ${commandName}:`, error);
         sendResponse('error', commandName, 'Internal server error');
