@@ -23,7 +23,7 @@ export async function writeMessage(user, channel, content) {
 
     let message = new Message(
         content,
-        user.username,
+        user.nickname,
         channel,
         date
     );

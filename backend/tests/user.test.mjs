@@ -4,7 +4,7 @@ import {createUser, getUser, deleteUser, updateNickname, joinChannel, leaveChann
 import {User} from "../models/user.js";
 import {config} from "./utils.mjs";
 
-beforeEach(config);
+beforeEach(await config);
 
 test("createUser should create a new user", async () => {
     const user = new User("user1", "password1", "nickname1", []);
@@ -45,7 +45,8 @@ test("joinChannel should add a channel to the user's channels", async () => {
     await createUser(user);
     await joinChannel("user1", "channel1");
     const updatedUser = await db.collection("users").findOne({username: "user1"});
-    expect(updatedUser.channels).toContain("channel1");
+    let toUser = new User(updatedUser.username, updatedUser.password, updatedUser.nickname, updatedUser.channels);
+    expect(toUser.channels).toContain("channel1");
 });
 
 test("leaveChannel should remove a channel from the user's channels", async () => {

@@ -10,7 +10,7 @@ import {User} from "../models/user.js";
 const user = new User("user1", "password1", "hallo", []);
 const channel = "channel1";
 const user2 = new User("user2", "password2", "hallo", []);
-beforeEach(config);
+beforeEach(await config);
 
 test("getAllMessagesFromChannel should return all messages from a channel", async () => {
     await writeMessage(user, channel, "Hello World");
