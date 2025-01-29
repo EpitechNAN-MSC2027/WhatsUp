@@ -72,8 +72,8 @@ export async function registerUser(username, password, nickname) {
  * @param token the jwt
  * @returns {{payload: *, signature: *, header: *}|*}
  */
-export function decodeToken(token) {
-    return jwt.decode(token, secretKey);
+export function verifyToken(token) {
+    return jwt.verify(token, secretKey);
 }
 
 /**
