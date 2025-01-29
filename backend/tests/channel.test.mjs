@@ -5,7 +5,7 @@ import Message from "../models/message.js";
 import {User} from "../models/user.js";
 import {config} from "./utils.mjs";
 
-beforeEach(config);
+beforeEach(await config);
 
 test("initGeneralChannel should create general channel if it does not exist", async () => {
     await initGeneralChannel(db);

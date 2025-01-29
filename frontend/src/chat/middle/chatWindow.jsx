@@ -20,23 +20,43 @@ const ChatWindow = ({ currentChannel, socket }) => {
     useEffect(() => {
         if (!socket) return;
 
-        /*
         socket.on('channel', (channel) => {
             console.log('Current channel:', channel);
-            currentChannel = channel;
         });
-         */
 
         socket.on('history', (history) => {
-            console.log('messages historic:', history);
-            setMessages(history);
-            console.log('messages array:', messages);
+            console.log('Messages history received:', history);
+            const formattedHistory = history.map(msg => ({
+                text: msg,
+                sender: msg.split(':')[0],
+                message: msg.split(':')[1],
+                type: 'received'
+            }));
+            setMessages(formattedHistory);
         });
 
         socket.on('message', (messageData) => {
             console.log('Message reçu:', messageData);
             setMessages(prevMessages => [...prevMessages, {
                 text: messageData,
+                sender: messageData.split(':')[0],
+                message: messageData.split(':')[1],
+                type: 'received'
+            }]);
+        });
+
+        socket.on('userJoined', (nickname) => {
+            setMessages(prevMessages => [...prevMessages, {
+                text: `${nickname} joined the channel :)`,
+                type: 'system-notification',
+                timestamp: new Date().toISOString()
+            }]);
+        });
+
+        socket.on('userLeft', (username) => {
+            setMessages(prevMessages => [...prevMessages, {
+                text: `${username} left the channel :(`,
+                type: 'system-notification'
             }]);
         });
 
@@ -44,7 +64,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             console.log('Response from server:', response);
             
             if (response.action === 'join' && response.status === 'success') {
-                //setMessages([]); // Réinitialiser les messages lors du changement de canal
+                // L'historique sera reçu via l'événement 'history'
             } else if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
                 setMessages(prev => [...prev, {
@@ -55,9 +75,28 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }
         });
 
+        socket.on('msg', (messageData) => {
+            console.log('Message privé reçu du serveur:', messageData);
+            setMessages(prevMessages => [...prevMessages, {
+                text: messageData,
+                type: 'private'
+            }]);
+        });
+
+        socket.on('response', (response) => {
+            console.log('Réponse du serveur:', response);
+            if (response.action === 'msg') {
+                console.log('Réponse pour message privé:', response);
+            }
+        });
+
         return () => {
             socket.off('message');
             socket.off('response');
+            socket.off('history');
+            socket.off('channel');
+            socket.off('userJoined');
+            socket.off('userLeft');
         };
     }, [socket]);
 
@@ -76,13 +115,37 @@ const ChatWindow = ({ currentChannel, socket }) => {
     const handleSendMessage = () => {
         if (!input.trim() || !socket) return;
 
-        // Envoyer le message au serveur
-        socket.emit('input', {
-            data: input,
-            timestamp: new Date().toISOString()
-        });
+        // Vérifier si c'est un message privé (@nickname)
+        const privateMessageMatch = input.match(/^@(\w+)\s+(.+)/);
+        if (privateMessageMatch) {
+            const [, nickname, message] = privateMessageMatch;
+            console.log('Message privé détecté:', { nickname, message });
+            
+            // Envoyer explicitement comme une commande msg
+            const commandData = {
+                command: 'msg',
+                args: [nickname, message]
+            };
+            console.log('Envoi de la commande au serveur:', commandData);
+            
+            socket.emit('command', commandData);
+            
+            // Ajouter le message à l'historique local
+            const localMessage = `${localStorage.getItem('username')} : ${message}`;
+            console.log('Ajout du message local:', localMessage);
+            
+            setMessages(prevMessages => [...prevMessages, {
+                text: localMessage,
+                type: 'private'
+            }]);
+        } else {
+            console.log('Message normal:', input);
+            socket.emit('input', {
+                data: input,
+                timestamp: new Date().toISOString()
+            });
+        }
 
-        // Ne pas afficher localement le message, attendre la confirmation du serveur
         setInput('');
         setCommandSuggestions([]);
     };
@@ -130,7 +193,11 @@ const ChatWindow = ({ currentChannel, socket }) => {
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages && messages.map((msg, index) => (
                     <div key={index} className={`message ${msg.type || 'received'}`}>
-                        {msg.channels ? (
+                        {msg.type === 'system-notification' ? (
+                            <div className="system-notification">
+                                {msg.text}
+                            </div>
+                        ) : msg.channels ? (
                             <div className="channel-list-message">
                                 <strong>{msg.text}</strong>
                                 <ul>
@@ -139,10 +206,14 @@ const ChatWindow = ({ currentChannel, socket }) => {
                                     ))}
                                 </ul>
                             </div>
+                        ) : msg.type === 'system-notification' ? (
+                            <div className="system-notification">
+                                {msg.text}
+                            </div>
                         ) : msg.sender ? (
                             <>
-                                <span className="message-sender">{msg.sender}: </span>
-                                <span className="message-text">{msg.text}</span>
+                                <span className="message-sender">{msg.sender} : </span>
+                                <span className="message-text">{msg.message}</span>
                             </>
                         ) : (
                             <span className="message-text">{msg.text}</span>
