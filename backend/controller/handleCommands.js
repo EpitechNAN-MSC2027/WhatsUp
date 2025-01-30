@@ -2,6 +2,7 @@ import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
 import * as messageService from "../services/messageServices.js";
 import { io } from "./websocket.js";
+import { PrivateMessage } from "../models/privateMessage.js";
 
 /**
  * Unified response handler
@@ -190,6 +191,8 @@ export async function quitChannel(socket, channel) {
         let channelToQuit = await channelService.getChannel(channel);
         if (channelToQuit) {
             if (socket.channel.name === channel) {
+                socket.to(channel).emit('userQuit', socket.user.nickname || socket.user.username);
+                
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
             }
@@ -219,18 +222,44 @@ export async function listUsers(socket) {
 }
 
 /**
- * Private message to a specific User
- * @param socket
- * @param user
- * @param message
- * @returns {Promise<void>}
+ * Send a private message to a specific User
+ * @param {*} socket 
+ * @param {*} username 
+ * @param {*} message 
  */
-export async function messageUser(socket, user, message) {
+export async function messageUser(socket, username, message) {
     try {
-        io.to(user).emit('msg', `${socket.user.nickname}: ${message}`);
-        await sendResponse(socket, 'success', 'msg', `Message sent to ${user}`);
+        console.log('Sending private message:', {
+            from: socket.user.nickname,
+            to: username,
+            message: message
+        });
+
+        const recipientSocket = Array.from(io.sockets.sockets.values())
+            .find(s => s.user?.username === username);
+
+        console.log('Recipient socket found:', recipientSocket?.id);
+
+        if (!recipientSocket) {
+            throw new Error(`User ${username} is not connected`);
+        }
+
+        const privateMessage = new PrivateMessage(
+            socket.user.nickname,
+            username,
+            message,
+            new Date()
+        );
+
+        console.log('Sending to recipient:', recipientSocket.id);
+        io.to(recipientSocket.id).emit('private_message', privateMessage.toConst());
+        
+        console.log('Sending to sender:', socket.id);
+        socket.emit('private_message', privateMessage.toConst());
+        
+        await sendResponse(socket, 'success', 'msg', `Message sent to ${username}`);
     } catch (error) {
-        console.log(error);
+        console.log('Error sending private message:', error);
         await sendResponse(socket, 'error', 'msg', error.message);
     }
 }

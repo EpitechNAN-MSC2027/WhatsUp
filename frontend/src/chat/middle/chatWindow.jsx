@@ -5,10 +5,9 @@ import EmojiPickerComponent from './emoji.jsx';
 import { handleCommand } from './responseHandler.jsx';
 
 /**
- *
- * @param selectedTeam
- * @returns {Element}
- * @constructor
+ * Chat window component
+ * @param {*} param0 
+ * @returns 
  */
 const ChatWindow = ({ currentChannel, socket }) => {
     const [messages, setMessages] = useState([]);
@@ -44,6 +43,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 type: 'received'
             }]);
         });
+        
 
         socket.on('userJoined', (nickname) => {
             setMessages(prevMessages => [...prevMessages, {
@@ -75,19 +75,26 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }
         });
 
-        socket.on('msg', (messageData) => {
-            console.log('Message privé reçu du serveur:', messageData);
+        socket.on('private_message', (messageData) => {
+            console.log('Message privé reçu:', messageData);
+            const currentUsername = localStorage.getItem('username');
+            const isFromMe = messageData.from === currentUsername;
+            
             setMessages(prevMessages => [...prevMessages, {
-                text: messageData,
-                type: 'private'
+                type: 'private',
+                sender: messageData.from,
+                receiver: messageData.to,
+                content: messageData.content,
+                isFromMe: isFromMe
             }]);
         });
 
-        socket.on('response', (response) => {
-            console.log('Réponse du serveur:', response);
-            if (response.action === 'msg') {
-                console.log('Réponse pour message privé:', response);
-            }
+        socket.on('userQuit', (username) => {
+            setMessages(prevMessages => [...prevMessages, {
+                text: `${username} quit the channel :(`,
+                type: 'system-notification',
+                timestamp: new Date().toISOString()
+            }]);
         });
 
         return () => {
@@ -97,6 +104,8 @@ const ChatWindow = ({ currentChannel, socket }) => {
             socket.off('channel');
             socket.off('userJoined');
             socket.off('userLeft');
+            socket.off('private_message');
+            socket.off('userQuit');
         };
     }, [socket]);
 
@@ -115,31 +124,14 @@ const ChatWindow = ({ currentChannel, socket }) => {
     const handleSendMessage = () => {
         if (!input.trim() || !socket) return;
 
-        // Vérifier si c'est un message privé (@nickname)
         const privateMessageMatch = input.match(/^@(\w+)\s+(.+)/);
         if (privateMessageMatch) {
             const [, nickname, message] = privateMessageMatch;
-            console.log('Message privé détecté:', { nickname, message });
-            
-            // Envoyer explicitement comme une commande msg
-            const commandData = {
-                command: 'msg',
-                args: [nickname, message]
-            };
-            console.log('Envoi de la commande au serveur:', commandData);
-            
-            socket.emit('command', commandData);
-            
-            // Ajouter le message à l'historique local
-            const localMessage = `${localStorage.getItem('username')} : ${message}`;
-            console.log('Ajout du message local:', localMessage);
-            
-            setMessages(prevMessages => [...prevMessages, {
-                text: localMessage,
-                type: 'private'
-            }]);
+            socket.emit('input', {
+                data: `/msg ${nickname} ${message}`,
+                timestamp: new Date().toISOString()
+            });
         } else {
-            console.log('Message normal:', input);
             socket.emit('input', {
                 data: input,
                 timestamp: new Date().toISOString()
@@ -209,6 +201,12 @@ const ChatWindow = ({ currentChannel, socket }) => {
                         ) : msg.type === 'system-notification' ? (
                             <div className="system-notification">
                                 {msg.text}
+                            </div>
+                        ) : msg.type === 'private' ? (
+                            <div className="private-message">
+                                <span className="message-text">
+                                    {msg.sender}: {msg.content}
+                                </span>
                             </div>
                         ) : msg.sender ? (
                             <>

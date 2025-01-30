@@ -214,8 +214,16 @@ h2 {
 }
 
 .message.private {
-    color: red;
+    background-color: #f4c7ba;
+    color: #c26c70;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 4px 0;
     font-style: italic;
+}
+
+.message.private .message-text {
+    color: inherit;
 }
 
 /* Ajuster les styles pour la responsivité */
