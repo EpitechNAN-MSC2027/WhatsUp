@@ -44,6 +44,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 type: 'received'
             }]);
         });
+        
 
         socket.on('userJoined', (nickname) => {
             setMessages(prevMessages => [...prevMessages, {
@@ -75,25 +76,18 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }
         });
 
-        socket.on('msg', (messageData) => {
-            console.log('Message privé reçu du serveur:', messageData);
+        socket.on('private_message', (messageData) => {
+            console.log('Message privé reçu:', messageData);
+            const currentUsername = localStorage.getItem('username');
+            const isFromMe = messageData.from === currentUsername;
+            
             setMessages(prevMessages => [...prevMessages, {
-                text: messageData,
-                type: 'private'
+                type: 'private',
+                sender: messageData.from,
+                receiver: messageData.to,
+                content: messageData.content,
+                isFromMe: isFromMe
             }]);
-        });
-
-        socket.on('response', (response) => {
-            console.log('Réponse du serveur:', response);
-            if (response.action === 'msg') {
-                console.log('Réponse pour message privé:', response);
-            }
-        });
-
-        socket.on('privateChannelCreated', (data) => {
-            console.log('Canal privé créé:', data);
-            // Le canal sera automatiquement ajouté via l'événement 'channels'
-            // et le chat sera mis à jour via l'événement 'channel'
         });
 
         return () => {
@@ -103,7 +97,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             socket.off('channel');
             socket.off('userJoined');
             socket.off('userLeft');
-            socket.off('privateChannelCreated');
+            socket.off('private_message');
         };
     }, [socket]);
 
@@ -121,30 +115,25 @@ const ChatWindow = ({ currentChannel, socket }) => {
 
     const handleSendMessage = () => {
         if (!input.trim() || !socket) return;
-    
-        // Check if it's a private message (@nickname or /msg)
-        const privateMessageMatch = input.match(/^[@/](?:msg\s+)?(\w+)\s+(.+)/);
+
+        const privateMessageMatch = input.match(/^@(\w+)\s+(.+)/);
         if (privateMessageMatch) {
             const [, nickname, message] = privateMessageMatch;
-            console.log('Private message detected:', { nickname, message });
-            
-            // Create/join a private channel
-            const commandData = {
-                command: 'private',
-                args: [nickname, message]
-            };
-            socket.emit('command', commandData);
+            socket.emit('input', {
+                data: `/msg ${nickname} ${message}`,
+                timestamp: new Date().toISOString()
+            });
         } else {
-            console.log('Normal message:', input);
             socket.emit('input', {
                 data: input,
                 timestamp: new Date().toISOString()
             });
         }
-    
+
         setInput('');
         setCommandSuggestions([]);
     };
+
 
     const handleInputChange = (e) => {
         const userInput = e.target.value;
@@ -200,6 +189,16 @@ const ChatWindow = ({ currentChannel, socket }) => {
                                         <li key={idx}>{channel}</li>
                                     ))}
                                 </ul>
+                            </div>
+                        ) : msg.type === 'system-notification' ? (
+                            <div className="system-notification">
+                                {msg.text}
+                            </div>
+                        ) : msg.type === 'private' ? (
+                            <div className="private-message">
+                                <span className="message-text">
+                                    {msg.sender}: {msg.content}
+                                </span>
                             </div>
                         ) : msg.sender ? (
                             <>
