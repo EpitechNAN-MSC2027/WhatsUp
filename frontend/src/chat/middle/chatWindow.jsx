@@ -5,10 +5,9 @@ import EmojiPickerComponent from './emoji.jsx';
 import { handleCommand } from './responseHandler.jsx';
 
 /**
- *
- * @param selectedTeam
- * @returns {Element}
- * @constructor
+ * Chat window component
+ * @param {*} param0 
+ * @returns 
  */
 const ChatWindow = ({ currentChannel, socket }) => {
     const [messages, setMessages] = useState([]);
@@ -90,6 +89,14 @@ const ChatWindow = ({ currentChannel, socket }) => {
             }]);
         });
 
+        socket.on('userQuit', (username) => {
+            setMessages(prevMessages => [...prevMessages, {
+                text: `${username} quit the channel :(`,
+                type: 'system-notification',
+                timestamp: new Date().toISOString()
+            }]);
+        });
+
         return () => {
             socket.off('message');
             socket.off('response');
@@ -98,6 +105,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             socket.off('userJoined');
             socket.off('userLeft');
             socket.off('private_message');
+            socket.off('userQuit');
         };
     }, [socket]);
 

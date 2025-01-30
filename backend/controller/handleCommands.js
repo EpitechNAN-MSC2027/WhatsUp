@@ -191,6 +191,8 @@ export async function quitChannel(socket, channel) {
         let channelToQuit = await channelService.getChannel(channel);
         if (channelToQuit) {
             if (socket.channel.name === channel) {
+                socket.to(channel).emit('userQuit', socket.user.nickname || socket.user.username);
+                
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
             }
