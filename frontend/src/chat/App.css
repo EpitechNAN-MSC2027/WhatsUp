@@ -226,6 +226,13 @@ h2 {
     color: inherit;
 }
 
+.channel-list-message {
+    font-size: 1.2rem;
+    color: #5ab6db;
+    font-style: italic;
+    font-family: "PT Serif", serif;
+}
+
 /* Ajuster les styles pour la responsivité */
 @media (max-width: 1200px) {
     .sidebar {
