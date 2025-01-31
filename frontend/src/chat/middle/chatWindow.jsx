@@ -307,10 +307,9 @@ const ChatWindow = ({ currentChannel, socket }) => {
                     </div>
                 )}
                 <div ref={messagesEndRef} />
-            </div>
-            {/* Indicateur de saisie */}
-            <div className="typing-indicator">
+                <div className="typing-indicator">
                 {typingIndicatorText && <span>{typingIndicatorText}</span>}
+                </div>
             </div>
             <div className="message-input">
                 <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
