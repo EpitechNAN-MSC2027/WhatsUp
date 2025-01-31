@@ -12,7 +12,7 @@ import { PrivateMessage } from "../models/privateMessage.js";
  * @param {string} message
  * @param {any} data
  */
-function sendResponse(socket, status, action, message, data = null) {
+export function sendResponse(socket, status, action, message, data = null) {
     socket.emit('response', {
         status,
         action,
