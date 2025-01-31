@@ -1,8 +1,8 @@
 import * as channelService from "../services/channelServices.js";
 import * as userService from "../services/userServices.js";
 import * as messageService from "../services/messageServices.js";
-import { io } from "./websocket.js";
-import { PrivateMessage } from "../models/privateMessage.js";
+import {io} from "./websocket.js";
+import {PrivateMessage} from "../models/privateMessage.js";
 
 /**
  * Unified response handler
@@ -36,24 +36,35 @@ export async function updateUser(socket) {
 }
 
 /**
- * Update the socket user
+ * Retrieve user data
  * @param username
  * @returns {Promise<*>}
  */
 export async function retrieveUser(username) {
-    try {
-        let user = await userService.getUser(username);
-        let channelsCreated = await channelService.getChannelsCreated(username);
-        return {
-            username: user['username'],
-            nickname: user['nickname'],
-            channels: user['channels'],
-            channelsAdmin: channelsCreated.map(ch => ch.name),
-        };
-    } catch (error) {
-        console.error(error);
-        return error;
-    }
+    const [user, channelsCreated] = await Promise.all([
+        userService.getUser(username),
+        channelService.getChannelsCreated(username)
+    ]);
+
+    return {
+        username: user.username,
+        nickname: user.nickname,
+        channels: user.channels,
+        channelsAdmin: channelsCreated.map(ch => ch.name),
+    };
+}
+
+export async function retrieveUserStatus(channel) {
+    const channelUsers = await channelService.getChannelUsers(channel);
+    const connectedUsernames = new Set(
+        Array.from(io.sockets.sockets.values())
+            .map(s => s.user?.username)
+            .filter(Boolean)
+    );
+    return channelUsers.map(username => ({
+        user: username,
+        isConnected: connectedUsernames.has(username)
+    }));
 }
 
 /**
@@ -140,11 +151,12 @@ export async function connectChannel(socket, channel) {
             socket.leave(socket.channel.name);
         }
         socket.channel = await channelService.getChannel(channel);
-        socket.join(socket.channel.name);
-        socket.emit('channel', socket.channel.name);
-        //socket.emit('users', socket.channel.users);
-        socket.emit('users', await channelService.getChannelUsers(socket.channel.name));
-        let messages = await messageService.getAllMessagesFromChannel(socket.channel.name);
+        socket.join(channel);
+        socket.emit('channel', channel);
+
+        io.to(channel).emit('users', await retrieveUserStatus(channel));
+
+        let messages = await messageService.getAllMessagesFromChannel(channel);
         socket.emit('history', messages.map(msg => `${msg.sender}: ${msg.message}`));
     } catch (error) {
         throw error;
@@ -165,6 +177,7 @@ export async function joinChannel(socket, channel) {
             await updateUser(socket);
         } catch (error) {
             console.log(error.message);
+            await sendResponse(socket, 'error', 'join', error.message);
         }
 
         await connectChannel(socket, channel);
@@ -191,13 +204,13 @@ export async function quitChannel(socket, channel) {
         let channelToQuit = await channelService.getChannel(channel);
         if (channelToQuit) {
             if (socket.channel.name === channel) {
-                socket.to(channel).emit('userQuit', socket.user.nickname || socket.user.username);
-                
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
             }
             await userService.leaveChannel(socket.user.username, channel);
             await channelService.removeUserFromChannel(channel, socket.user.username);
+            socket.to(channel).emit('users', await retrieveUserStatus(channel));
+            socket.to(channel).emit('userQuit', socket.user.nickname || socket.user.username);
             await updateUser(socket);
             await sendResponse(socket, 'success', 'quit', 'Quit channel', channel);
         }

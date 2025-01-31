@@ -69,10 +69,7 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
     }, [socket, onChannelChange, onMembersChange]);
 
     const handleChannelClick = (channel) => {
-        socket.emit('input', {
-            data: `/join ${channel}`,
-            timestamp: new Date().toISOString(),
-        });
+        socket.emit('move', channel);
     };
 
     return (

@@ -65,3 +65,22 @@
     font-size: 16px;
     color: #333;
 }
+
+/* Styles for the status dot */
+.status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Green for online users */
+.online {
+    background-color: #2ecc71;  /* Green */
+}
+
+/* Gray for offline users */
+.offline {
+    background-color: #7f8c8d;  /* Gray */
+}
