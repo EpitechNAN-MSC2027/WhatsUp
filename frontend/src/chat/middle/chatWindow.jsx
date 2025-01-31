@@ -67,6 +67,10 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 text: `${username} left the channel :(`,
                 type: 'system-notification'
             }]);
+            if (soundsEnabled) {
+                console.log("Déclencher le son pour un utilisateur qui quitte"); // Log pour déboguer
+                setPlayJoinSound(true); // Jouer le son pour un utilisateur qui rejoint
+            }
         });
 
         socket.on('response', (response) => {
