@@ -1,5 +1,5 @@
-import {Server} from "socket.io";
-import * as auth from"../services/authentication.js"
+import { Server } from "socket.io";
+import * as auth from "../services/authentication.js";
 import * as cmds from "./handleCommands.js";
 import { executeCommand } from "./commands.js";
 
@@ -69,6 +69,7 @@ export function createWebsocketServer(server) {
         socket.emit('channels', socket.user.channels);
         await cmds.connectChannel(socket, 'general');
 
+        // Handle channel move
         socket.on('move', async (channel) => {
             await cmds.connectChannel(socket, channel);
 
@@ -80,6 +81,7 @@ export function createWebsocketServer(server) {
              */
         });
 
+        // Handle user input
         socket.on('input', async (input) => {
             if (input.data.startsWith('/')) {
                 // Parse the command
@@ -89,6 +91,16 @@ export function createWebsocketServer(server) {
                 console.log('Received message:', input.data);
                 await cmds.sendMessage(socket, input.data);
             }
+        });
+
+        // Handle typing events
+        socket.on('typing', (data) => {
+            cmds.handleTyping(socket, data);
+        });
+
+        // Handle stopped typing events
+        socket.on('stoppedTyping', (data) => {
+            cmds.handleStoppedTyping(socket, data);
         });
 
         // Handle disconnections

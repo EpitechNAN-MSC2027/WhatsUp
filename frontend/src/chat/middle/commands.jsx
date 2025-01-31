@@ -5,6 +5,7 @@ const commands = {
     msg: "Send a private message to a specific user",
     list: "List all available channels",
     quit: "Leave a specified channel",
+    users: "List all users",
 };
 
 export default commands;

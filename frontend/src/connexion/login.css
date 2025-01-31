@@ -1,15 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=La+Belle+Aurore&family=Sniglet:wght@400;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
 :root {
-    --color-back : #5A97BB;
-    --color-light : #ECE9CA;
-    --color-dark : #EED0A6;
-    --color-button : #E09182;
-    --color-banner : #688C80;
-    --color-text : #9A4F42;
+    --login-color-light : #ECE9CA;
+    --login-color-dark : #EED0A6;
+    --login-color-button : #E09182;
+    --login-color-banner : #688C80;
+    --login-color-text : #9A4F42;
   }
   
   html, body {
+    background-color: var(--color-back);
     margin: 0;
     height: 100%;
     overflow: hidden;
@@ -35,7 +35,7 @@
   
   .form_login {
     z-index: 1;
-    background-color: var(--color-light);
+    background-color: var(--login-color-light);
     display: flex;
     flex-direction: column;
     width: 410px;
@@ -47,7 +47,7 @@
   h1 {
     font-family: "Sniglet", serif;
     font-weight: 400;
-    color: var(--color-text);
+    color: var(--login-color-text);
     font-size: 45px;
     margin-bottom: 10px;
     margin-top: 13px;
@@ -56,7 +56,7 @@
   label {
     font-family: "Playwrite AU SA", serif;
     font-weight: 400;
-    color: var(--color-text);
+    color: var(--login-color-text);
     font-size: 20px;
     margin: 5px 0;
   }
@@ -64,18 +64,18 @@
   input {
     padding: 8px;
     border-radius: 10px;
-    background-color: var(--color-dark);
+    background-color: var(--login-color-dark);
     border: none;
     font-size: 16px;
     color: var(--color-text);
   }
   
   .button {
-    background-color: var(--color-button);
+    background-color: var(--login-color-button);
     margin-top: 30px;
     height: 40px;
     font-size: 18px;
-    color: var(--color-text);
+    color: var(--login-color-text);
     
   }
   
@@ -84,7 +84,7 @@
   }
   
   .link a {
-    color: var(--color-button);
+    color: var(--login-color-button);
     text-decoration: none;
   }
   
