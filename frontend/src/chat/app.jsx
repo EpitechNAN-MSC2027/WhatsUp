@@ -35,6 +35,11 @@ const App = () => {
         }
     }, [navigate]);
 
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'theme-original';
+        document.body.className = savedTheme;
+    }, []);
+
     const handleLogout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('username');

@@ -5,6 +5,7 @@ import MembersSection from './sidebar-right/members';
 const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, currentChannel }) => {
     const [joinedChannels, setJoinedChannels] = useState([]);
     const [channelMembers, setChannelMembers] = useState([]);
+    const [showSettings, setShowSettings] = useState(false);
 
     useEffect(() => {
         if (!socket) return;
@@ -75,6 +76,17 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
         });
     };
 
+    const handleThemeChange = (theme) => {
+        document.body.className = theme;
+        localStorage.setItem('theme', theme);
+        setShowSettings(false);
+    };
+
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme') || 'theme-original';
+        document.body.className = savedTheme;
+    }, []);
+
     return (
         <div className="sidebar">
             <h3>My channels</h3>
@@ -91,9 +103,42 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
                     ))}
                 </ul>
             </div>
+            <button onClick={() => setShowSettings(true)} className="settings-button">
+                Settings
+            </button>
             <button onClick={onLogout} className="logout-button">
                 Log out
             </button>
+
+            {showSettings && (
+                <div className="settings-panel">
+                    <h3>Choose Theme</h3>
+                    <button 
+                        className="theme-button"
+                        onClick={() => handleThemeChange('theme-original')}
+                    >
+                        Original Theme
+                    </button>
+                    <button 
+                        className="theme-button"
+                        onClick={() => handleThemeChange('theme-dark')}
+                    >
+                        Dark Theme
+                    </button>
+                    <button 
+                        className="theme-button"
+                        onClick={() => handleThemeChange('theme-nature')}
+                    >
+                        Nature Theme
+                    </button>
+                    <button 
+                        className="theme-button"
+                        onClick={() => setShowSettings(false)}
+                    >
+                        Close
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

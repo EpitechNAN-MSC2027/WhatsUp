@@ -268,7 +268,10 @@ h2 {
     margin: 8px 0;
 }
 
+
+
 /* Ajuster les styles pour la responsivité */
+
 @media (max-width: 1200px) {
     .sidebar {
         min-width: 150px;
@@ -296,4 +299,105 @@ h2 {
         width: 65%;
         padding: 10px;
     }
+}
+
+/* Thème original */
+.theme-original {
+    --color-back: #5A97BB;
+    --color-light: #fce9cb;
+    --color-button-send: #f4c7ba;
+    --color-button-hover: #e6a5ab;
+    --color-emoji-picker: white;
+    --color-back-sidebar: #dff2f9;
+    --color-right-sidebar-border: #c26c70;
+    --color-sidebar: #ddd;
+    --color-sidebar-hover: #fbfefc;
+    --color-namechannel: #f4c4ba;
+    --color-h3: #5ab6db;
+    --color-text: #9c6956;
+    --color-text-send-button: #c26c70;
+}
+
+/* Thème sombre */
+.theme-dark {
+    --color-back: #2c3e50;
+    --color-light: #34495e;
+    --color-button-send: #e74c3c;
+    --color-button-hover: #c0392b;
+    --color-emoji-picker: #2c3e50;
+    --color-back-sidebar: #2c3e50;
+    --color-right-sidebar-border: #e74c3c;
+    --color-sidebar: #34495e;
+    --color-sidebar-hover: #3d566e;
+    --color-namechannel: #e74c3c;
+    --color-h3: #ecf0f1;
+    --color-text: #ecf0f1;
+    --color-text-send-button: #ffffff;
+}
+
+/* Thème nature */
+.theme-nature {
+    --color-back: #2ecc71;
+    --color-light: #f1f8e9;
+    --color-button-send: #8bc34a;
+    --color-button-hover: #689f38;
+    --color-emoji-picker: white;
+    --color-back-sidebar: #c8e6c9;
+    --color-right-sidebar-border: #4caf50;
+    --color-sidebar: #e8f5e9;
+    --color-sidebar-hover: #f1f8e9;
+    --color-namechannel: #4caf50;
+    --color-h3: #2e7d32;
+    --color-text: #33691e;
+    --color-text-send-button: #1b5e20;
+}
+
+/* Style pour le panel de paramètres */
+.settings-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-light);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.settings-panel h3 {
+    margin-bottom: 20px;
+}
+
+.theme-button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: var(--color-button-send);
+    color: var(--color-text-send-button);
+}
+
+.theme-button:hover {
+    background-color: var(--color-button-hover);
+}
+
+.settings-button {
+    margin-top: auto;
+    padding: 10px;
+    background-color: var(--color-button-send);
+    color: var(--color-text-send-button);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.settings-button:hover {
+    background-color: var(--color-button-hover);
 }
