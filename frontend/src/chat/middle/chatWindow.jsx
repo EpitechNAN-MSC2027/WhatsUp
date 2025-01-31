@@ -3,17 +3,16 @@ import io from 'socket.io-client';
 import commands from './commands.jsx';
 import EmojiPickerComponent from './emoji.jsx';
 import { handleCommand } from './responseHandler.jsx';
+import SoundPlayer from './SoundPlayer'; // Importez le composant SoundPlayer
 
-/**
- * Chat window component
- * @param {*} param0 
- * @returns 
- */
 const ChatWindow = ({ currentChannel, socket }) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [commandSuggestions, setCommandSuggestions] = useState([]);
     const [channels, setChannels] = useState([]);
+    const [playJoinSound, setPlayJoinSound] = useState(false);
+    const [playMessageSound, setPlayMessageSound] = useState(false);
+    const [soundsEnabled, setSoundsEnabled] = useState(true); // État pour activer/désactiver les sons
     const messagesEndRef = useRef(null);
 
     useEffect(() => {
@@ -42,16 +41,26 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 message: messageData.split(':')[1],
                 type: 'received'
             }]);
+            if (soundsEnabled) {
+                console.log("Déclencher le son pour un nouveau message"); // Log pour déboguer
+                setPlayMessageSound(true); // Jouer le son pour un nouveau message
+            }
         });
-        
 
         socket.on('userJoined', (nickname) => {
+            console.log(`${nickname} a rejoint le canal`); // Log pour déboguer
             setMessages(prevMessages => [...prevMessages, {
                 text: `${nickname} joined the channel :)`,
                 type: 'system-notification',
                 timestamp: new Date().toISOString()
             }]);
+            if (soundsEnabled) {
+                console.log("Déclencher le son pour un utilisateur qui rejoint"); // Log pour déboguer
+                setPlayJoinSound(true); // Jouer le son pour un utilisateur qui rejoint
+            }
         });
+
+
 
         socket.on('userLeft', (username) => {
             setMessages(prevMessages => [...prevMessages, {
@@ -62,7 +71,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
 
         socket.on('response', (response) => {
             console.log('Response from server:', response);
-            
+
             if (response.action === 'join' && response.status === 'success') {
                 // L'historique sera reçu via l'événement 'history'
             } else if (response.action === 'list' && response.status === 'success') {
@@ -79,7 +88,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
             console.log('Message privé reçu:', messageData);
             const currentUsername = localStorage.getItem('username');
             const isFromMe = messageData.from === currentUsername;
-            
+
             setMessages(prevMessages => [...prevMessages, {
                 type: 'private',
                 sender: messageData.from,
@@ -107,9 +116,24 @@ const ChatWindow = ({ currentChannel, socket }) => {
             socket.off('private_message');
             socket.off('userQuit');
         };
-    }, [socket]);
+    }, [socket, soundsEnabled]);
 
-    //Fonction pour gérer le défilement
+    // Réinitialiser les sons après la lecture
+    useEffect(() => {
+        if (playJoinSound) {
+            console.log("Réinitialiser le son pour un utilisateur qui rejoint"); // Log pour déboguer
+            setPlayJoinSound(false);
+        }
+    }, [playJoinSound]);
+
+    useEffect(() => {
+        if (playMessageSound) {
+            console.log("Réinitialiser le son pour un nouveau message"); // Log pour déboguer
+            setPlayMessageSound(false);
+        }
+    }, [playMessageSound]);
+
+    // Fonction pour gérer le défilement
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -141,7 +165,6 @@ const ChatWindow = ({ currentChannel, socket }) => {
         setInput('');
         setCommandSuggestions([]);
     };
-
 
     const handleInputChange = (e) => {
         const userInput = e.target.value;
@@ -177,10 +200,18 @@ const ChatWindow = ({ currentChannel, socket }) => {
         }
     };
 
+    // Fonction pour activer/désactiver les sons
+    const toggleSounds = () => {
+        setSoundsEnabled(!soundsEnabled);
+    };
+
     return (
         <div className="chat-window">
             <div className="chat-header">
                 <h2>{currentChannel ? `${currentChannel}` : 'general'}</h2>
+                <button onClick={toggleSounds}>
+                    {soundsEnabled ? 'Désactiver les sons' : 'Activer les sons'}
+                </button>
             </div>
             <div className="messages" style={{overflowY: 'auto', height: '60vh'}}>
                 {messages && messages.map((msg, index) => (
@@ -224,8 +255,8 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
                 <input
                     type="text"
-                    placeholder={currentChannel 
-                        ? "Type a message, e.g., /list or Hello!" 
+                    placeholder={currentChannel
+                        ? "Type a message, e.g., /list or Hello!"
                         : "Use /list to view available channels or /join <channel> to join a channel"}
                     value={input}
                     onChange={handleInputChange}
@@ -248,6 +279,12 @@ const ChatWindow = ({ currentChannel, socket }) => {
                     </div>
                 )}
             </div>
+            {soundsEnabled && (
+                <>
+                    <SoundPlayer soundFile="./Blip.mp3" play={playJoinSound} />
+                    <SoundPlayer soundFile="./Bling.mp3" play={playMessageSound} />
+                </>
+            )}
         </div>
     );
 };
