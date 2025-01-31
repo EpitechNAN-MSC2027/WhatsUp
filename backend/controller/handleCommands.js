@@ -19,7 +19,37 @@ function sendResponse(socket, status, action, message, data = null) {
         message,
         data,
         timestamp: new Date().toISOString(),
-    })
+    });
+}
+
+/**
+ * Handle typing event
+ * @param {*} socket
+ * @param {*} data
+ */
+export async function handleTyping(socket, data) {
+    try {
+        const { user, channel } = data;
+        // Diffuser à tous les utilisateurs du canal que l'utilisateur est en train de taper
+        socket.to(channel).emit('userTyping', { user });
+    } catch (error) {
+        console.error('Error handling typing event:', error);
+    }
+}
+
+/**
+ * Handle stopped typing event
+ * @param {*} socket
+ * @param {*} data
+ */
+export async function handleStoppedTyping(socket, data) {
+    try {
+        const { user, channel } = data;
+        // Diffuser à tous les utilisateurs du canal que l'utilisateur a arrêté de taper
+        socket.to(channel).emit('userStoppedTyping', { user });
+    } catch (error) {
+        console.error('Error handling stopped typing event:', error);
+    }
 }
 
 /**
@@ -142,7 +172,6 @@ export async function connectChannel(socket, channel) {
         socket.channel = await channelService.getChannel(channel);
         socket.join(socket.channel.name);
         socket.emit('channel', socket.channel.name);
-        //socket.emit('users', socket.channel.users);
         socket.emit('users', await channelService.getChannelUsers(socket.channel.name));
         let messages = await messageService.getAllMessagesFromChannel(socket.channel.name);
         socket.emit('history', messages.map(msg => `${msg.sender}: ${msg.message}`));
@@ -192,7 +221,7 @@ export async function quitChannel(socket, channel) {
         if (channelToQuit) {
             if (socket.channel.name === channel) {
                 socket.to(channel).emit('userQuit', socket.user.nickname || socket.user.username);
-                
+
                 socket.leave(channel);
                 await connectChannel(socket, 'general');
             }
@@ -223,9 +252,9 @@ export async function listUsers(socket) {
 
 /**
  * Send a private message to a specific User
- * @param {*} socket 
- * @param {*} username 
- * @param {*} message 
+ * @param {*} socket
+ * @param {*} username
+ * @param {*} message
  */
 export async function messageUser(socket, username, message) {
     try {
@@ -253,10 +282,10 @@ export async function messageUser(socket, username, message) {
 
         console.log('Sending to recipient:', recipientSocket.id);
         io.to(recipientSocket.id).emit('private_message', privateMessage.toConst());
-        
+
         console.log('Sending to sender:', socket.id);
         socket.emit('private_message', privateMessage.toConst());
-        
+
         await sendResponse(socket, 'success', 'msg', `Message sent to ${username}`);
     } catch (error) {
         console.log('Error sending private message:', error);

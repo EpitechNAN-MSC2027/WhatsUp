@@ -13,7 +13,61 @@ const ChatWindow = ({ currentChannel, socket }) => {
     const [playJoinSound, setPlayJoinSound] = useState(false);
     const [playMessageSound, setPlayMessageSound] = useState(false);
     const [soundsEnabled, setSoundsEnabled] = useState(true); // État pour activer/désactiver les sons
+    const [isTyping, setIsTyping] = useState(false); // État pour savoir si l'utilisateur est en train de taper
+    const [typingUsers, setTypingUsers] = useState([]); // Liste des utilisateurs en train de taper
     const messagesEndRef = useRef(null);
+
+    // Détecter quand l'utilisateur commence à taper
+    useEffect(() => {
+        let typingTimeout;
+
+        if (input.trim()) {
+            setIsTyping(true);
+            // Émettre un événement "typing" au serveur
+            socket.emit('typing', { user: localStorage.getItem('username'), channel: currentChannel });
+
+            // Définir un délai pour détecter quand l'utilisateur a arrêté de taper
+            typingTimeout = setTimeout(() => {
+                setIsTyping(false);
+                // Émettre un événement "stoppedTyping" au serveur
+                socket.emit('stoppedTyping', { user: localStorage.getItem('username'), channel: currentChannel });
+            }, 1000); // Délai de 1 seconde
+        } else {
+            setIsTyping(false);
+            // Émettre un événement "stoppedTyping" au serveur
+            socket.emit('stoppedTyping', { user: localStorage.getItem('username'), channel: currentChannel });
+        }
+
+        return () => clearTimeout(typingTimeout);
+    }, [input, socket, currentChannel]);
+
+    // Écouter les événements de saisie des autres utilisateurs
+    useEffect(() => {
+        if (!socket) return;
+
+        socket.on('userTyping', (data) => {
+            setTypingUsers((prev) => {
+                if (!prev.includes(data.user)) {
+                    return [...prev, data.user];
+                }
+                return prev;
+            });
+        });
+
+        socket.on('userStoppedTyping', (data) => {
+            setTypingUsers((prev) => prev.filter(user => user !== data.user));
+        });
+
+        return () => {
+            socket.off('userTyping');
+            socket.off('userStoppedTyping');
+        };
+    }, [socket]);
+
+    // Afficher les utilisateurs en train de taper
+    const typingIndicatorText = typingUsers.length > 0
+        ? `${typingUsers.join(', ')} ${typingUsers.length > 1 ? 'are' : 'is'} typing...`
+        : null;
 
     useEffect(() => {
         if (!socket) return;
@@ -59,8 +113,6 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 setPlayJoinSound(true); // Jouer le son pour un utilisateur qui rejoint
             }
         });
-
-
 
         socket.on('userLeft', (username) => {
             setMessages(prevMessages => [...prevMessages, {
@@ -254,6 +306,10 @@ const ChatWindow = ({ currentChannel, socket }) => {
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
+            </div>
+            {/* Indicateur de saisie */}
+            <div className="typing-indicator">
+                {typingIndicatorText && <span>{typingIndicatorText}</span>}
             </div>
             <div className="message-input">
                 <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />

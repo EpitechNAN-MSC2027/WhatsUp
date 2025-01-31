@@ -233,6 +233,16 @@ h2 {
     font-family: "PT Serif", serif;
 }
 
+.typing-indicator {
+    padding: 8px;
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin: 8px 0;
+}
+
 /* Ajuster les styles pour la responsivité */
 @media (max-width: 1200px) {
     .sidebar {
