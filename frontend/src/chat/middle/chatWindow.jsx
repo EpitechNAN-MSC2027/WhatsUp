@@ -19,6 +19,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
     const [isTyping, setIsTyping] = useState(false); 
     const [typingUsers, setTypingUsers] = useState([]);
     const messagesEndRef = useRef(null);
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         let typingTimeout;
@@ -131,6 +132,8 @@ const ChatWindow = ({ currentChannel, socket }) => {
                     type: 'system',
                     channels: response.data
                 }]);
+            } else if (response.action === 'users' && response.status === 'success') {
+                setUsers(response.data);
             }
         });
 
@@ -293,6 +296,16 @@ const ChatWindow = ({ currentChannel, socket }) => {
                         )}
                     </div>
                 ))}
+                {users.length > 0 && (
+                    <div className="channel-list-message">
+                        <strong>Users in the channel :</strong>
+                        <ul>
+                            {users.map((user, index) => (
+                                <li key={index}>{user}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
             {/* Indicateur de saisie */}
