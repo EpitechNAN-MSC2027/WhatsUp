@@ -47,18 +47,18 @@ body {
 
 /* Thème cyber */
 .theme-cyber {
-  --color-back: #efefef;
-  --color-light: black;
-  --color-button-send: #534e8c;
-  --color-button-hover: #5b516c;
+  --color-back: #ffc9b2;
+  --color-light:#c57777;
+  --color-button-send: #d7745d;
+  --color-button-hover: #eb8c68;
   --color-emoji-picker: #c1abbf;
-  --color-back-sidebar: #c1abbf;
-  --color-right-sidebar-border: #534e8c;
+  --color-back-sidebar: #B3A26D;
+  --color-right-sidebar-border: #ffc9b2;
   --color-sidebar: #e8f5e9;
   --color-sidebar-hover: #f1f8e9;
-  --color-namechannel: #d43d36;
-  --color-h3: #534e8c;
-  --color-text: #aeaeae;
+  --color-namechannel: #be836f;
+  --color-h3: #C6C77A;
+  --color-text: #ffd4c3;
   --color-text-send-button: #efefef;
   --color-back-input : #bf7c80;
 }
