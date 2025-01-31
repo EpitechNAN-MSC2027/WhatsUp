@@ -19,7 +19,7 @@ const App = () => {
             navigate('/login');
         } else {
             setIsConnected(true);
-            const newSocket = io('http://localhost:3000', {
+            const newSocket = io(`http://${window.location.hostname}:3000`, {
                 auth: {
                     token: token,
                 },
