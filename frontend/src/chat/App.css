@@ -1,27 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
 
-:root {
-    --color-back : #5A97BB;
-    --color-light : #fce9cb;
-    --color-button-send : #f4c7ba;
-    --color-button-hover : #e6a5ab;
-    --color-emoji-picker : white;
 
 
-    --color-back-sidebar : #dff2f9;
-    --color-right-sidebar-border : #c26c70;
-    --color-sidebar : #ddd;
-    --color-sidebar-hover : #fbfefc;
-    
-    --color-namechannel : #f4c4ba;
-    --color-h3 : #5ab6db;
-    --color-text : #9c6956;
-    --color-text-send-button : #c26c70;
-
-}
+html {
+    background-color: var(--color-back);
+}   
 
 h3 {
     margin:0 0 10px 0;
+
     font-family: "Playwrite AU SA", serif;
     font-size: 1.3rem;
     color:var(--color-h3);
@@ -220,8 +207,9 @@ h2 {
 }
 
 .logout-button:hover {
-    background-color: #e6a5ab;
+    background-color: var(--color-button-hover);
 }
+
 
 .system-notification {
     text-align: center;
@@ -268,11 +256,24 @@ h2 {
     margin: 8px 0;
 }
 
+input {
+    background-color: var(--color-back-input);
+    border: none;
+}
 
+.members-section h4 {
+    color: var(--color-back);
+}
+
+.profile-section {
+    border-bottom: 2px solid var(--color-right-sidebar-border);
+}
 
 /* Ajuster les styles pour la responsivité */
 
+
 @media (max-width: 1200px) {
+
     .sidebar {
         min-width: 150px;
     }
@@ -316,10 +317,12 @@ h2 {
     --color-h3: #5ab6db;
     --color-text: #9c6956;
     --color-text-send-button: #c26c70;
+    --color-back-input : #EED0A6;
+
 }
 
-/* Thème sombre */
-.theme-dark {
+/* Thème néon */
+.theme-neon {
     --color-back: #2c3e50;
     --color-light: #34495e;
     --color-button-send: #e74c3c;
@@ -333,24 +336,28 @@ h2 {
     --color-h3: #ecf0f1;
     --color-text: #ecf0f1;
     --color-text-send-button: #ffffff;
+    --color-back-input : #EED0A6;
 }
 
-/* Thème nature */
-.theme-nature {
-    --color-back: #2ecc71;
-    --color-light: #f1f8e9;
-    --color-button-send: #8bc34a;
-    --color-button-hover: #689f38;
-    --color-emoji-picker: white;
-    --color-back-sidebar: #c8e6c9;
-    --color-right-sidebar-border: #4caf50;
+
+/* Thème cyber */
+.theme-cyber {
+    --color-back: black;
+    --color-light: #1d1d1d;
+    --color-button-send: #534e8c;
+    --color-button-hover: #5b516c;
+    --color-emoji-picker: #c1abbf;
+    --color-back-sidebar: #c1abbf;
+    --color-right-sidebar-border: #534e8c;
     --color-sidebar: #e8f5e9;
     --color-sidebar-hover: #f1f8e9;
-    --color-namechannel: #4caf50;
-    --color-h3: #2e7d32;
-    --color-text: #33691e;
-    --color-text-send-button: #1b5e20;
+    --color-namechannel: #d43d36;
+    --color-h3: #534e8c;
+    --color-text: #aeaeae;
+    --color-text-send-button: #efefef;  
+    --color-back-input : #bf7c80;
 }
+
 
 /* Style pour le panel de paramètres */
 .settings-panel {

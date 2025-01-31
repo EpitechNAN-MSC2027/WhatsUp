@@ -26,42 +26,6 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
             onMembersChange(members);
         })
 
-        /*
-        // Écoute des réponses
-        socket.on('response', async (response) => {
-            console.log('Response received in LeftSideBar:', response);
-            if (response.action === 'join' && response.status === 'success') {
-                setJoinedChannels(prev => {
-                    if (!prev.includes(response.data)) {
-                        return [...prev, response.data];
-                    }
-                    return prev;
-                });
-
-
-                onChannelChange(response.data);
-            }
-            else if (response.action === 'create' && response.status === 'success') {
-                window.location.reload();
-            } 
-            else if (response.action === 'quit') {
-                setJoinedChannels(prev => prev.filter(channel => channel !== response.data));
-            } 
-            else if (response.action === 'members') {
-                setChannelMembers(response.data);
-                onMembersChange(response.data);
-            }
-        });
-
-         */
-
-        /*
-        // Demande initiale des channels
-        socket.emit('input', {
-            data: '/channels',
-            timestamp: new Date().toISOString(),
-        });
-         */
 
         return () => {
             socket.off('channels');
@@ -121,15 +85,15 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
                     </button>
                     <button 
                         className="theme-button"
-                        onClick={() => handleThemeChange('theme-dark')}
+                        onClick={() => handleThemeChange('theme-neon')}
                     >
-                        Dark Theme
+                        Neon Theme
                     </button>
                     <button 
                         className="theme-button"
-                        onClick={() => handleThemeChange('theme-nature')}
+                        onClick={() => handleThemeChange('theme-cyber')}
                     >
-                        Nature Theme
+                        Cyber Theme
                     </button>
                     <button 
                         className="theme-button"
