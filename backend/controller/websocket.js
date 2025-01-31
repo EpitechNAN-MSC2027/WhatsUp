@@ -52,6 +52,18 @@ export function createWebsocketServer(server) {
     // Handle connections
     io.on('connection', async (socket) => {
         console.log('Socket connected:', socket.id);
+        const username = socket.user?.username;
+        if (username) {
+            try {
+                const user = await cmds.retrieveUser(username);
+                const channels = user.channels || [];
+                for (const channel of channels) {
+                    io.to(channel).emit('users', await cmds.retrieveUserStatus(channel));
+                }
+            } catch (error) {
+                console.error('Error during connection handling:', error);
+            }
+        }
 
         // Send user channels to client
         socket.emit('channels', socket.user.channels);
@@ -61,10 +73,12 @@ export function createWebsocketServer(server) {
         socket.on('move', async (channel) => {
             await cmds.connectChannel(socket, channel);
 
+            /*
             // Notifier les autres utilisateurs du nouveau canal
             if (socket.channel?.name) {
                 socket.to(socket.channel.name).emit('userJoined', socket.user.nickname);
             }
+             */
         });
 
         // Handle user input
@@ -90,8 +104,20 @@ export function createWebsocketServer(server) {
         });
 
         // Handle disconnections
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             console.log(`Socket disconnected: ${socket.id}`);
+            const username = socket.user?.username;
+            if (username) {
+                try {
+                    const user = await cmds.retrieveUser(username);
+                    const channels = user.channels || [];
+                    for (const channel of channels) {
+                        io.to(channel).emit('users', await cmds.retrieveUserStatus(channel));
+                    }
+                } catch (error) {
+                    console.error('Error during disconnect handling:', error);
+                }
+            }
         });
     });
 }
