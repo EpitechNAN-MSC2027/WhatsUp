@@ -184,8 +184,12 @@ export async function connectChannel(socket, channel) {
         socket.join(channel);
         socket.emit('channel', channel);
         io.to(channel).emit('users', await retrieveUserStatus(channel));
-        let messages = await messageService.getAllMessagesFromChannel(channel)
-        socket.emit('history', messages.map(msg => `${msg.sender}: ${msg.message}`));
+        let messages = await messageService.getAllMessagesFromChannel(channel);
+        console.log(messages);
+        socket.emit('history', messages.map(msg => ({
+            sender: msg.sender,
+            message: msg.message,
+        })));
     } catch (error) {
         throw error;
     }
@@ -315,7 +319,10 @@ export async function sendMessage(socket, message) {
     try {
         messageService.writeMessage(socket.user, socket.channel.name, message);
         console.log(socket.id, "sent", message);
-        io.to(socket.channel.name).emit('message', `${socket.user.nickname}: ${message}`);
+        io.to(socket.channel.name).emit('message', {
+            sender: socket.user.nickname,
+            message: message,
+        });
         await sendResponse(socket, 'success', 'message', 'Message sent');
     } catch (error) {
         console.log(error);
