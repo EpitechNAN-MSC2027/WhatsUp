@@ -78,8 +78,8 @@ const ChatWindow = ({ currentChannel, socket }) => {
             console.log('Messages history received:', history);
             const formattedHistory = history.map(msg => ({
                 text: msg,
-                sender: msg.split(':')[0],
-                message: msg.split(':')[1],
+                sender: msg.sender,
+                message: msg.message,
                 type: 'received'
             }));
             shouldScrollInstant.current = true;
@@ -90,8 +90,8 @@ const ChatWindow = ({ currentChannel, socket }) => {
             console.log('Message reçu:', messageData);
             setMessages(prevMessages => [...prevMessages, {
                 text: messageData,
-                sender: messageData.split(':')[0],
-                message: messageData.split(':')[1],
+                sender: messageData.sender,
+                message: messageData.message,
                 type: 'received'
             }]);
             if (soundsEnabled) {
