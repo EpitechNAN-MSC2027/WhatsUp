@@ -108,13 +108,62 @@ h2 {
 .message-input {
     display: flex;
     height: 45px;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    padding-top: 8px;
+}
+
+.input-container {
+    flex: 1;
+    display: flex;
+    position: relative;
+    margin-left: 30px;
+    overflow: visible;
 }
 
 .message-input input {
     flex: 1;
-    padding: 5px;
     border-radius: 4px;
     font-size: 1.1rem;
+    padding: 10px;
+    position: relative;
+    z-index: 2;
+}
+
+.typing-indicator {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-button-send);
+    padding: 1px 2px;
+    border-radius: 4px 4px 0 0;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-size: 0.8em;
+    pointer-events: none;
+    z-index: 1;
+    color: var(--color-text-send-button);
+    font-style: italic;
+}
+
+.typing-indicator::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -5px;  /* Adjust this value as needed */
+    height: 5px;   /* Adjust to match the desired extension */
+    background: inherit;
+    border-radius: 0 0 4px 4px; /* Match the overall shape */
+}
+
+.typing-indicator.active {
+    transform: translateY(0);
+    opacity: 1;
 }
 
 .message-input button {
@@ -241,15 +290,6 @@ h2 {
     color: #5ab6db;
     font-style: italic;
     font-family: "PT Serif", serif;
-}
-
-.typing-indicator {
-    padding: 8px;
-    font-style: italic;
-    color: #666;
-    font-size: 0.8em;
-    border-radius: 4px;
-    margin: 8px 0;
 }
 
 input {

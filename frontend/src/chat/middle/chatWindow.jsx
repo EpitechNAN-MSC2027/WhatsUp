@@ -315,21 +315,24 @@ const ChatWindow = ({ currentChannel, socket }) => {
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
-                <div className="typing-indicator">
-                {typingIndicatorText && <span>{typingIndicatorText}</span>}
-                </div>
             </div>
             <div className="message-input">
                 <EmojiPickerComponent onEmojiSelect={handleEmojiSelect} />
-                <input
-                    type="text"
-                    placeholder={currentChannel
-                        ? "Type a message, e.g., /list or Hello!"
-                        : "Use /list to view available channels or /join <channel> to join a channel"}
-                    value={input}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                />
+
+                <div className="input-container">
+                    <div className={`typing-indicator ${typingIndicatorText ? 'active' : ''}`}>
+                        {typingIndicatorText && <span>{typingIndicatorText}</span>}
+                    </div>
+                    <input
+                        type="text"
+                        placeholder={currentChannel
+                            ? "Type a message, e.g., /list or Hello!"
+                            : "Use /list to view available channels or /join <channel> to join a channel"}
+                        value={input}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                    />
+                </div>
                 <button onClick={handleSendMessage}>Send</button>
                 {commandSuggestions.length > 0 && (
                     <div className="command-suggestions">
