@@ -19,6 +19,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
     const [isTyping, setIsTyping] = useState(false); 
     const [typingUsers, setTypingUsers] = useState([]);
     const messagesEndRef = useRef(null);
+    const shouldScrollInstant = useRef(false);
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
@@ -81,6 +82,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 message: msg.split(':')[1],
                 type: 'received'
             }));
+            shouldScrollInstant.current = true;
             setMessages(formattedHistory);
         });
 
@@ -124,8 +126,7 @@ const ChatWindow = ({ currentChannel, socket }) => {
         socket.on('response', (response) => {
             console.log('Response from server:', response);
 
-            if (response.action === 'join' && response.status === 'success') {
-            } else if (response.action === 'list' && response.status === 'success') {
+            if (response.action === 'list' && response.status === 'success') {
                 setChannels(response.data);
                 setMessages(prev => [...prev, {
                     text: 'Channels :',
@@ -134,6 +135,11 @@ const ChatWindow = ({ currentChannel, socket }) => {
                 }]);
             } else if (response.action === 'users' && response.status === 'success') {
                 setUsers(response.data);
+                setMessages(prev => [...prev, {
+                    text: 'Users in the channel :',
+                    type: 'system',
+                    users: response.data
+                }]);
             }
         });
 
@@ -183,14 +189,17 @@ const ChatWindow = ({ currentChannel, socket }) => {
         }
     }, [playMessageSound]);
 
-    const scrollToBottom = () => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
-
     useEffect(() => {
-        scrollToBottom();
+        if (messagesEndRef.current) {
+            if (shouldScrollInstant.current) {
+                // Instant scroll for channel changes
+                messagesEndRef.current.scrollIntoView({ behavior: 'auto' });
+                shouldScrollInstant.current = false;
+            } else {
+                // Smooth scroll for new messages
+                messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
     }, [messages]);
 
     const handleSendMessage = () => {
@@ -276,6 +285,15 @@ const ChatWindow = ({ currentChannel, socket }) => {
                                     ))}
                                 </ul>
                             </div>
+                        ) : msg.users ? (
+                            <div className="channel-list-message">
+                                <strong>{msg.text}</strong>
+                                <ul>
+                                    {msg.users.map((user, idx) => (
+                                        <li key={idx}>{user}</li>
+                                    ))}
+                                </ul>
+                            </div>
                         ) : msg.type === 'system-notification' ? (
                             <div className="system-notification">
                                 {msg.text}
@@ -296,16 +314,6 @@ const ChatWindow = ({ currentChannel, socket }) => {
                         )}
                     </div>
                 ))}
-                {users.length > 0 && (
-                    <div className="channel-list-message">
-                        <strong>Users in the channel :</strong>
-                        <ul>
-                            {users.map((user, index) => (
-                                <li key={index}>{user}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
                 <div ref={messagesEndRef} />
                 <div className="typing-indicator">
                 {typingIndicatorText && <span>{typingIndicatorText}</span>}
