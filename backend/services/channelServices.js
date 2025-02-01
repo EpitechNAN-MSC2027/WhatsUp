@@ -12,7 +12,7 @@ export async function initGeneralChannel() {
     let res = await db.collection("channels").findOne({name: "general"});
     if (!res) {
         console.log("Creating general channel");
-        let channel = new Channel("general", "admin", [], ["admin"]);
+        let channel = new Channel("general", "", []);
         let createResponse = await db.collection("channels").insertOne(channel.toConst());
         if (!createResponse.acknowledged) {
             throw new Error("Channel not created")
@@ -29,9 +29,10 @@ export async function initGeneralChannel() {
 export async function getChannels(filter) {
     let res;
     if (filter) {
-        let regexPattern = `.* {${filter}}.*`
+        const escapedFilter = filter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regexPattern = `.*${escapedFilter}.*`
         res = await db.collection("channels")
-            .find({ name: new RegExp(regexPattern) }, { projection: { name: 1, _id: 0 } })
+            .find({ name: new RegExp(regexPattern, 'i') }, { projection: { name: 1, _id: 0 } })
             .toArray();
     } else {
         res = await db.collection("channels")
