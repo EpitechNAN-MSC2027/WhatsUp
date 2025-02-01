@@ -126,19 +126,31 @@ const ChatWindow = ({ currentChannel, socket }) => {
         socket.on('response', (response) => {
             console.log('Response from server:', response);
 
-            if (response.action === 'list' && response.status === 'success') {
-                setChannels(response.data);
+            if (response.status === 'success') {
+                switch (response.action) {
+                    case 'list':
+                        setChannels(response.data);
+                        setMessages(prev => [...prev, {
+                            text: 'Channels :',
+                            type: 'system',
+                            channels: response.data
+                        }]);
+                        break;
+                    case 'users':
+                        setUsers(response.data);
+                        setMessages(prev => [...prev, {
+                            text: 'Users in the channel :',
+                            type: 'system',
+                            users: response.data
+                        }]);
+                        break;
+                    default:
+                        break;
+                }
+            } else {
                 setMessages(prev => [...prev, {
-                    text: 'Channels :',
-                    type: 'system',
-                    channels: response.data
-                }]);
-            } else if (response.action === 'users' && response.status === 'success') {
-                setUsers(response.data);
-                setMessages(prev => [...prev, {
-                    text: 'Users in the channel :',
-                    type: 'system',
-                    users: response.data
+                    text: response.message,
+                    type: 'system-error'
                 }]);
             }
         });
@@ -296,6 +308,10 @@ const ChatWindow = ({ currentChannel, socket }) => {
                             </div>
                         ) : msg.type === 'system-notification' ? (
                             <div className="system-notification">
+                                {msg.text}
+                            </div>
+                        ) : msg.type === 'system-error' ? (
+                            <div className="system-error">
                                 {msg.text}
                             </div>
                         ) : msg.type === 'private' ? (

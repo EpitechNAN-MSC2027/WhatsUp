@@ -271,6 +271,13 @@ h2 {
     opacity: 0.8;
 }
 
+.system-error {
+    font-size: 1.2rem;
+    color: #ff5c5c;
+    font-style: italic;
+    font-family: "PT Serif", serif;
+}
+
 .message.private {
     background-color: var(--color-button-send);
     color: var(--color-text-send-button);
