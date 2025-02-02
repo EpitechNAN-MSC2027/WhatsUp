@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Playwrite+AU+SA:wght@100..400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=La+Belle+Aurore&family=Sniglet:wght@400;800&display=swap');
+
+.right-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background-color: #f4c7ba;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow-x:hidden;
+    overflow-y: auto;
+}
+
+/* Section Profil */
+.profile-section {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #c26c70;
+    height: 17%;
+}
+
+.avatar {
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    margin-left: -5px;
+    margin-top: 40px;
+}
+
+
+
+/* Section Membres */
+.members-section {
+    flex-grow: 1;
+    padding: 4px;
+    margin-top: 10px;
+}
+
+.members-section h4 {
+    margin-bottom: 1px;
+    color: #5A97BB;
+    font-family: "Josefin Sans", serif;
+    margin-top: 4px;
+    font-size: 1.5rem;
+}
+
+.member-item {
+    display: flex;
+    margin-bottom: 10px;
+    font-family: "Sniglet", serif;
+    color:#9c6956;
+}
+
+.member-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.member-item span {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Styles for the status dot */
+.status-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+/* Green for online users */
+.online {
+    background-color: #2ecc71;  /* Green */
+}
+
+/* Gray for offline users */
+.offline {
+    background-color: #7f8c8d;  /* Gray */
+}

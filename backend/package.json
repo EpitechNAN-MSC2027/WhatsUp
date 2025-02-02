@@ -2,14 +2,25 @@
   "name": "backend",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@jest/globals": "^29.7.0",
     "cookie-parser": "~1.4.7",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
     "express": "~4.16.4",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.12.0",
     "morgan": "~1.9.1",
     "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.4",
+    "vitest": "^3.0.4"
   }
 }
