@@ -416,3 +416,63 @@ input {
     }
 
   }
+
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .sidebar {
+        min-width:14px;
+        width: 17%;
+      }
+      .chat-window {
+        width: 69%;
+        padding: 10px;
+      }
+      .right-sidebar {
+        display: block;
+        min-width: 10%;
+        width: 14%;
+      }
+      .avatar {
+        width: 150px;
+        height: 150px;
+        margin-top: -90px;
+      }
+      .messages {
+        font-size: 1.1rem;
+      }
+      .profile-section {
+        height: 8%;
+      }
+      .emoji-picker-component {
+        display: none;
+      }
+      .input-container {
+        margin-left: 0;
+      }
+      .message-input button {
+        display: none;
+      }
+      .message-input input {
+        font-size: 0.9rem;
+      }
+      .command-suggestions {
+        width: 100%;
+        bottom: 40px;
+      }
+      .logout-button {
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 5px;
+      }
+      .settings-button {
+          font-size: 0.9rem;
+          font-weight: 600;
+          padding: 5px;
+      }
+      h3 {
+        font-size: 1rem;
+      }
+      h2 {
+        font-size: 1.3rem;
+      }
+  
+  }
