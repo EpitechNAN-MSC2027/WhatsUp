@@ -6,6 +6,7 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
     const [joinedChannels, setJoinedChannels] = useState([]);
     const [channelMembers, setChannelMembers] = useState([]);
     const [showSettings, setShowSettings] = useState(false);
+    const [userAvatar, setUserAvatar] = useState(null);
 
     useEffect(() => {
         if (!socket) return;
@@ -26,12 +27,19 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
             onMembersChange(members);
         })
 
-
         return () => {
             socket.off('channels');
             socket.off('response');
         };
     }, [socket, onChannelChange, onMembersChange]);
+
+    useEffect(() => {
+        const username = localStorage.getItem('username');
+        const savedAvatar = localStorage.getItem(`avatar_${username}`);
+        if (savedAvatar) {
+            setUserAvatar(JSON.parse(savedAvatar));
+        }
+    }, []);
 
     const handleChannelClick = (channel) => {
         socket.emit('move', channel);
@@ -50,6 +58,22 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
 
     return (
         <div className="sidebar">
+            <div className="user-profile">
+                {userAvatar && (
+                    <div className="avatar-container-small">
+                        {Object.keys(userAvatar).map(part => (
+                            <img
+                                key={part}
+                                className="avatar-image"
+                                src={part === 'clothes' ? 
+                                    `/avatars/outfit${userAvatar[part]}.png` : 
+                                    `/avatars/${part}${userAvatar[part]}.png`}
+                                alt={part}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
             <h3>My channels</h3>
             <div className="channels-container">
                 <ul className="channel-list">
