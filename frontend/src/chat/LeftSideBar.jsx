@@ -84,13 +84,13 @@ const LeftSideBar = ({ onChannelChange, onMembersChange, onLogout, socket, curre
                         className="theme-button"
                         onClick={() => handleThemeChange('theme-neon')}
                     >
-                        Neon Theme
+                        Night Theme
                     </button>
                     <button 
                         className="theme-button"
                         onClick={() => handleThemeChange('theme-cyber')}
                     >
-                        Cyber Theme
+                        Coffee Theme
                     </button>
                     <button 
                         className="theme-button"

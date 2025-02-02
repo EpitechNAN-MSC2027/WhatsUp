@@ -155,10 +155,10 @@ h2 {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -5px;  /* Adjust this value as needed */
-    height: 5px;   /* Adjust to match the desired extension */
+    bottom: -5px;
+    height: 5px;
     background: inherit;
-    border-radius: 0 0 4px 4px; /* Match the overall shape */
+    border-radius: 0 0 4px 4px; 
 }
 
 .typing-indicator.active {
@@ -247,7 +247,6 @@ h2 {
     cursor: pointer;
     font-size: 1.2rem;
     width: 100%;
-
     margin-top: 20px;
 }
 
@@ -362,3 +361,58 @@ input {
     background-color: var(--color-button-hover);
 }
 
+@media (max-width: 768px) {
+    .sidebar {
+      min-width:14px;
+      width: 24%;
+    }
+    .chat-window {
+      width: 76%;
+    }
+    .right-sidebar {
+      display: none;
+    }
+    .avatar {
+      width: 150px;
+      height: 150px;
+    }
+    .messages {
+      font-size: 0.9rem;
+    }
+    .profile-section {
+      height: 10%;
+    }
+    .emoji-picker-component {
+      display: none;
+    }
+    .input-container {
+      margin-left: 0;
+    }
+    .message-input button {
+      display: none;
+    }
+    .message-input input {
+      font-size: 0.9rem;
+    }
+    .command-suggestions {
+      width: 100%;
+      bottom: 40px;
+    }
+    .logout-button {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 5px;
+    }
+    .settings-button {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 5px;
+    }
+    h3 {
+      font-size: 0.9rem;
+    }
+    h2 {
+      font-size: 1rem;
+    }
+
+  }
