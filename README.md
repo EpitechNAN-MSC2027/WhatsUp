@@ -134,15 +134,3 @@ services:
 - `npm run dev`: Start the React development server.
 
 ---
-
-## Folder Structure
-
-```
-mern-chat-app/
-├── backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── services/
-│   ├── .env
-│   ├── app.js
-├── front/
