@@ -28,37 +28,37 @@ body {
 
 /* Thème néon */
 .theme-neon {
-  --color-back: black;
-  --color-light: #0BA278;
-  --color-button-send: #e74c3c;
-  --color-button-hover: #c0392b;
+  --color-back: #232c6f;
+  --color-light: #1F1F5B;
+  --color-button-send: #9265c3;
+  --color-button-hover: #d29ef1;
   --color-emoji-picker: #2c3e50;
-  --color-back-sidebar: #6c1c0a;
-  --color-right-sidebar-border: #e74c3c;
+  --color-back-sidebar: #495aad;
+  --color-right-sidebar-border: #3d2d7c;
   --color-sidebar: #6c1c0a;
-  --color-sidebar-hover: #3d566e;
-  --color-namechannel: #A7A8A6;
-  --color-h3: #EB2326;
-  --color-text: #3CEDC1;
+  --color-sidebar-hover: #1F1F5B;
+  --color-namechannel: #b0aaee;
+  --color-h3: #8bb1f2;
+  --color-text: #c5c8f5;
   --color-text-send-button: #f1dfdd;
-  --color-back-input : #A7A8A6;
+  --color-back-input : #495aad;
 }
 
 
 /* Thème cyber */
 .theme-cyber {
-  --color-back: #ffc9b2;
-  --color-light:#c57777;
+  --color-back: #ffd0bc;
+  --color-light:#c78686;
   --color-button-send: #d7745d;
   --color-button-hover: #eb8c68;
   --color-emoji-picker: #c1abbf;
-  --color-back-sidebar: #B3A26D;
+  --color-back-sidebar: #919B5B;
   --color-right-sidebar-border: #ffc9b2;
   --color-sidebar: #e8f5e9;
   --color-sidebar-hover: #f1f8e9;
-  --color-namechannel: #be836f;
+  --color-namechannel: #b37662;
   --color-h3: #C6C77A;
-  --color-text: #ffd4c3;
+  --color-text: #ffded2;
   --color-text-send-button: #efefef;
   --color-back-input : #bf7c80;
 }
