@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SignUpForm = ({ switchToSignIn }) => {
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -20,17 +23,16 @@ const SignUpForm = ({ switchToSignIn }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
-            console.log(response.body)
 
             const result = await response.json();
             if (result.success) {
-                alert('Account created successfully!');
-                switchToSignIn();
+                localStorage.setItem('username', username);
+                navigate('/avatar-customization');
             } else {
                 alert(result.message);
             }
         } catch (error) {
-            alert('Erreur lors de la création du compte.');
+            alert('Error creating account.');
         }
     };
 
