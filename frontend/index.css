@@ -26,7 +26,6 @@ body {
 
 }
 
-/* Thème néon */
 .theme-neon {
   --color-back: #232c6f;
   --color-light: #1F1F5B;
@@ -45,7 +44,6 @@ body {
 }
 
 
-/* Thème cyber */
 .theme-cyber {
   --color-back: #ffd0bc;
   --color-light:#c78686;
